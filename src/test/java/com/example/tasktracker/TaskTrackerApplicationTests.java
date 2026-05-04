@@ -1,13 +1,12 @@
-package com.example.tasktacker;
+package com.example.tasktracker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TaskTackerApplicationTests {
+class TaskTrackerApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }

@@ -1,0 +1,173 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TaskStatus.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\TaskStatus.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:56:00.983Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Task.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Task.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:58.622Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Tag.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Tag.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:57.059Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ProjectStatus.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\ProjectStatus.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:55.366Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Project.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Project.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:53.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Comment.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\model\\Comment.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:46.085Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ValidationException.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\ValidationException.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:44.49Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "NotFoundException.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\NotFoundException.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:42.533Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "DomainException.java",
+              "DocumentMoniker": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java",
+              "ToolTip": "C:\\Users\\artem\\Desktop\\\u0434\u0440\u0443\u0433\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u044B\\task-tacker\\src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java",
+              "RelativeToolTip": "src\\main\\java\\com\\example\\tasktracker\\domain\\exception\\DomainException.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2026-02-08T05:55:38.232Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

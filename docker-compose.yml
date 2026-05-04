@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: tasktracker-postgres
+    environment:
+      POSTGRES_DB: tasktracker
+      POSTGRES_USER: tasktracker
+      POSTGRES_PASSWORD: tasktracker
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

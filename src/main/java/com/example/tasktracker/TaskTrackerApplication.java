@@ -1,13 +1,12 @@
-package com.example.tasktacker;
+package com.example.tasktracker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TaskTackerApplication {
+public class TaskTrackerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TaskTackerApplication.class, args);
+		SpringApplication.run(TaskTrackerApplication.class, args);
 	}
-
 }
