@@ -19,7 +19,7 @@ const deadlineBarsEl = document.getElementById("deadlineBars");
 const activityChartEl = document.getElementById("activityChart");
 
 const taskCreateForm = document.getElementById("createTaskForm");
-const projectIdInput = document.getElementById("projectIdInput");
+const projectSelectInput = document.getElementById("projectSelectInput");
 const titleInput = document.getElementById("titleInput");
 const createStatusInput = document.getElementById("createStatusInput");
 const deadlineInput = document.getElementById("deadlineInput");
@@ -27,24 +27,77 @@ const createTaskBtn = document.getElementById("createTaskBtn");
 const resetTaskFormBtn = document.getElementById("clearTaskFormBtn");
 const createTaskMessage = document.getElementById("createTaskMessage");
 
+const createProjectForm = document.getElementById("createProjectForm");
+const projectTitleInput = document.getElementById("projectTitleInput");
+const projectStatusInput = document.getElementById("projectStatusInput");
+const projectDeadlineInput = document.getElementById("projectDeadlineInput");
+const createProjectBtn = document.getElementById("createProjectBtn");
+const clearProjectFormBtn = document.getElementById("clearProjectFormBtn");
+const createProjectMessage = document.getElementById("createProjectMessage");
+
+
 
 let allTasks = [];
+let allProjects = [];
 
-const storage = {
-    lastProjectIdKey: "taskTracker.lastProjectId",
 
-    saveLastProjectId(projectId) {
-        if (projectId) {
-            localStorage.setItem(this.lastProjectIdKey, projectId);
-        }
-    },
-
-    readLastProjectId() {
-        return localStorage.getItem(this.lastProjectIdKey) ?? "";
-    }
-};
 
 const taskApi = {
+
+    async createProject(payload) {
+        const response = await fetch("/api/projects", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            let errorText = `Ошибка создания проекта: HTTP ${response.status}`;
+
+            try {
+                const responseText = await response.text();
+                if (responseText) {
+                    errorText = responseText;
+                }
+            } catch (error) {
+                console.error("Не удалось прочитать текст ошибки", error);
+            }
+
+            throw new Error(errorText);
+        }
+
+        return response.json();
+    },
+
+    async getProjects() {
+        const response = await fetch("/api/projects");
+
+        if (!response.ok) {
+            throw new Error(`Ошибка загрузки проектов: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    },
+
+    async createProject(payload) {
+        const response = await fetch("/api/projects", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(responseText || `Ошибка создания проекта: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    },
+
     async getTasks() {
         const response = await fetch("/api/tasks");
 
@@ -65,18 +118,8 @@ const taskApi = {
         });
 
         if (!response.ok) {
-            let errorText = `Ошибка создания задачи: HTTP ${response.status}`;
-
-            try {
-                const responseText = await response.text();
-                if (responseText) {
-                    errorText = responseText;
-                }
-            } catch (error) {
-                console.error("Не удалось прочитать текст ошибки", error);
-            }
-
-            throw new Error(errorText);
+            const responseText = await response.text();
+            throw new Error(responseText || `Ошибка создания задачи: HTTP ${response.status}`);
         }
 
         return response.json();
@@ -119,6 +162,119 @@ const taskApi = {
         }
     }
 };
+
+async function onCreateProjectSubmit(event) {
+    event.preventDefault();
+    clearCreateProjectMessage();
+
+    const formData = getCreateProjectFormData();
+    const validationError = validateCreateProjectFormData(formData);
+
+    if (validationError) {
+        showCreateProjectMessage(validationError, "error");
+        return;
+    }
+
+    const payload = {
+        title: formData.title,
+        status: formData.status,
+        deadline: formData.deadline ? new Date(formData.deadline).toISOString() : null
+    };
+
+    setCreateProjectLoading(true);
+
+    try {
+        const createdProject = await taskApi.createProject(payload);
+
+        resetCreateProjectForm();
+        showCreateProjectMessage(`Проект создан: ${createdProject.title}`, "success");
+
+        await loadProjects();
+
+        if (projectSelectInput) {
+            projectSelectInput.value = createdProject.id;
+        }
+    } catch (error) {
+        console.error(error);
+        showCreateProjectMessage(normalizeErrorMessage(error), "error");
+    } finally {
+        setCreateProjectLoading(false);
+    }
+}
+
+function getCreateProjectFormData() {
+    return {
+        title: projectTitleInput?.value.trim() ?? "",
+        status: projectStatusInput?.value ?? "NEW",
+        deadline: projectDeadlineInput?.value ?? ""
+    };
+}
+
+function validateCreateProjectFormData(data) {
+    if (!data.title) {
+        return "Название проекта обязательно.";
+    }
+
+    if (!data.status) {
+        return "Статус проекта обязателен.";
+    }
+
+    if (data.deadline) {
+        const parsedDeadline = new Date(data.deadline);
+
+        if (Number.isNaN(parsedDeadline.getTime())) {
+            return "Некорректный deadline проекта.";
+        }
+    }
+
+    return null;
+}
+
+function setCreateProjectLoading(isLoading) {
+    if (!createProjectBtn) {
+        return;
+    }
+
+    createProjectBtn.disabled = isLoading;
+    createProjectBtn.textContent = isLoading ? "Создание..." : "Создать проект";
+
+    if (projectTitleInput) projectTitleInput.disabled = isLoading;
+    if (projectStatusInput) projectStatusInput.disabled = isLoading;
+    if (projectDeadlineInput) projectDeadlineInput.disabled = isLoading;
+    if (clearProjectFormBtn) clearProjectFormBtn.disabled = isLoading;
+}
+
+function resetCreateProjectForm() {
+    if (!createProjectForm) {
+        return;
+    }
+
+    createProjectForm.reset();
+
+    if (projectStatusInput) {
+        projectStatusInput.value = "NEW";
+    }
+
+    clearCreateProjectMessage();
+}
+
+function showCreateProjectMessage(message, type) {
+    if (!createProjectMessage) {
+        return;
+    }
+
+    createProjectMessage.textContent = message;
+    createProjectMessage.className = `form-message ${type}`;
+}
+
+function clearCreateProjectMessage() {
+    if (!createProjectMessage) {
+        return;
+    }
+
+    createProjectMessage.textContent = "";
+    createProjectMessage.className = "form-message";
+}
 
 async function onTaskStatusSave(taskId, nextStatus, button, select) {
     const previousButtonText = button.textContent;
@@ -175,6 +331,14 @@ loadBtn.addEventListener("click", loadTasks);
 searchInput.addEventListener("input", renderVisibleTasks);
 statusFilter.addEventListener("change", renderVisibleTasks);
 
+if (createProjectForm) {
+    createProjectForm.addEventListener("submit", onCreateProjectSubmit);
+}
+
+if (clearProjectFormBtn) {
+    clearProjectFormBtn.addEventListener("click", resetCreateProjectForm);
+}
+
 if (taskCreateForm) {
     taskCreateForm.addEventListener("submit", onCreateTaskSubmit);
 }
@@ -184,7 +348,7 @@ if (resetTaskFormBtn) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    restoreCreateFormState();
+    loadProjects();
     loadTasks();
 });
 
@@ -213,6 +377,43 @@ async function loadTasks() {
     } finally {
         setLoadingState(false);
     }
+}
+
+async function loadProjects() {
+    try {
+        allProjects = await taskApi.getProjects();
+        renderProjectSelect(allProjects);
+    } catch (error) {
+        console.error(error);
+        allProjects = [];
+        renderProjectSelect([]);
+        showCreateTaskMessage("Не удалось загрузить проекты. Проверь /api/projects.", "error");
+    }
+}
+
+function renderProjectSelect(projects) {
+    if (!projectSelectInput) {
+        return;
+    }
+
+    if (projects.length === 0) {
+        projectSelectInput.innerHTML = `
+            <option value="">Нет проектов. Сначала создай проект через API.</option>
+        `;
+        projectSelectInput.disabled = true;
+        return;
+    }
+
+    projectSelectInput.disabled = false;
+
+    projectSelectInput.innerHTML = `
+        <option value="">Выбери проект</option>
+        ${projects.map(project => `
+            <option value="${escapeHtml(project.id)}">
+                ${escapeHtml(project.title)} — ${escapeHtml(project.status)}
+            </option>
+        `).join("")}
+    `;
 }
 
 function setLoadingState(isLoading) {
@@ -260,8 +461,7 @@ async function onCreateTaskSubmit(event) {
     try {
         const createdTask = await taskApi.createTask(payload);
 
-        storage.saveLastProjectId(formData.projectId);
-        resetCreateTaskForm({ keepProjectId: true });
+        resetCreateTaskForm();
 
         showCreateTaskMessage(`Задача успешно создана: ${createdTask.title}`, "success");
         await loadTasks();
@@ -274,22 +474,8 @@ async function onCreateTaskSubmit(event) {
 }
 
 function getCreateTaskFormData() {
-    let projectId = projectIdInput?.value.trim() ?? "";
-
-    if (!projectId) {
-        projectId = storage.readLastProjectId();
-    }
-
-    if (!projectId) {
-        projectId = generateUuid();
-    }
-
-    if (projectIdInput) {
-        projectIdInput.value = projectId;
-    }
-
     return {
-        projectId,
+        projectId: projectSelectInput?.value ?? "",
         title: titleInput?.value.trim() ?? "",
         status: createStatusInput?.value ?? "NEW",
         deadline: deadlineInput?.value ?? ""
@@ -333,43 +519,28 @@ function setCreateTaskLoading(isLoading) {
     createTaskBtn.disabled = isLoading;
     createTaskBtn.textContent = isLoading ? "Создание..." : "Добавить задачу";
 
-    if (projectIdInput) projectIdInput.disabled = isLoading;
+    if (projectSelectInput) projectSelectInput.disabled = isLoading;
     if (titleInput) titleInput.disabled = isLoading;
     if (createStatusInput) createStatusInput.disabled = isLoading;
     if (deadlineInput) deadlineInput.disabled = isLoading;
     if (resetTaskFormBtn) resetTaskFormBtn.disabled = isLoading;
 }
 
-function resetCreateTaskForm(options = { keepProjectId: false }) {
+function resetCreateTaskForm() {
     if (!taskCreateForm) {
         return;
     }
 
-    const currentProjectId = projectIdInput?.value.trim() ?? "";
     taskCreateForm.reset();
 
     if (createStatusInput) {
         createStatusInput.value = "NEW";
     }
 
-    if (options.keepProjectId && projectIdInput) {
-        projectIdInput.value = currentProjectId || storage.readLastProjectId();
-    }
-
     clearCreateTaskMessage();
 }
 
-function restoreCreateFormState() {
-    const lastProjectId = storage.readLastProjectId();
 
-    if (projectIdInput && lastProjectId) {
-        projectIdInput.value = lastProjectId;
-    }
-
-    if (createStatusInput) {
-        createStatusInput.value = "NEW";
-    }
-}
 
 function showCreateTaskMessage(message, type) {
     if (!createTaskMessage) {
@@ -773,6 +944,4 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
-function generateUuid() {
-    return crypto.randomUUID();
-}
+

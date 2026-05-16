@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: tasktracker
       POSTGRES_PASSWORD: tasktracker
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - tasktracker_pgdata:/var/lib/postgresql/data
     restart: unless-stopped

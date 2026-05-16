@@ -4,6 +4,7 @@ import com.example.tasktracker.api.TaskCreateRequest;
 import com.example.tasktracker.domain.exception.NotFoundException;
 import com.example.tasktracker.domain.model.Task;
 import com.example.tasktracker.domain.model.TaskStatus;
+import com.example.tasktracker.repository.ProjectRepository;
 import com.example.tasktracker.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,12 @@ import java.util.UUID;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final ProjectRepository projectRepository;
     private final Clock clock;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository) {
         this.taskRepository = taskRepository;
+        this.projectRepository = projectRepository;
         this.clock = Clock.systemUTC();
     }
 
@@ -27,6 +30,9 @@ public class TaskService {
     }
 
     public Task create(TaskCreateRequest request) {
+        projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new NotFoundException("Project not found: " + request.projectId()));
+
         Task task = Task.create(
                 request.projectId(),
                 request.title(),

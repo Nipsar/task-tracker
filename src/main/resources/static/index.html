@@ -24,18 +24,55 @@
         <section class="panel create-task-panel">
             <div class="panel-head create-task-head">
                 <div>
+                    <h2>Создать проект</h2>
+                    <p>Форма отправляет POST /api/projects и обновляет список проектов</p>
+                </div>
+            </div>
+
+            <form id="createProjectForm" class="create-task-form">
+                <label class="form-field form-field-wide">
+                    <span>Название проекта</span>
+                    <input id="projectTitleInput" name="title" type="text" class="filter-input" placeholder="Например: Учебный проект" required>
+                </label>
+
+                <label class="form-field">
+                    <span>Статус</span>
+                    <select id="projectStatusInput" name="status" class="filter-select" required>
+                        <option value="NEW">NEW</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="DONE">DONE</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Deadline</span>
+                    <input id="projectDeadlineInput" name="deadline" type="datetime-local" class="filter-input">
+                </label>
+
+                <div class="form-actions">
+                    <button id="createProjectBtn" type="submit" class="primary-btn">Создать проект</button>
+                    <button id="clearProjectFormBtn" type="button" class="secondary-btn">Очистить</button>
+                </div>
+            </form>
+
+            <div id="createProjectMessage" class="form-message" aria-live="polite"></div>
+        </section>
+
+        <section class="panel create-task-panel">
+            <div class="panel-head create-task-head">
+                <div>
                     <h2>Добавить задачу</h2>
                     <p>Форма отправляет POST /api/tasks и сразу обновляет дашборд</p>
                 </div>
             </div>
 
             <form id="createTaskForm" class="create-task-form">
-                <!--
                 <label class="form-field form-field-wide">
-                    <span>Project ID</span>
-                    <input id="projectIdInput" name="projectId" type="text" class="filter-input" placeholder="UUID проекта" required>
+                    <span>Проект</span>
+                    <select id="projectSelectInput" name="projectId" class="filter-select" required>
+                        <option value="">Загрузка проектов...</option>
+                    </select>
                 </label>
-                -->
 
                 <label class="form-field form-field-wide">
                     <span>Название</span>

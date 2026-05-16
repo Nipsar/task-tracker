@@ -1,113 +1,124 @@
 package com.example.tasktracker.domain.model;
 
 import com.example.tasktracker.domain.exception.ValidationException;
+import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-public final class Project {
+@Entity
+@Table(name = "projects")
+public class Project {
 
-    private final UUID id;
-    private final Instant createdAt;
+    @Id
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
+    private UUID id;
 
+    @Column(nullable = false)
     private String title;
-    private Instant deadline;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ProjectStatus status;
 
-    private Project(UUID id, Instant createdAt, String title, Instant deadline, ProjectStatus status){
+    @Column
+    private Instant deadline;
 
-        this.id = Objects.requireNonNull(id);
-        this.createdAt = Objects.requireNonNull(createdAt);
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
+    protected Project() {
+    }
+
+    private Project(UUID id, String title, ProjectStatus status, Instant deadline, Instant createdAt) {
+        this.id = id;
         this.title = normalizeAndValidateTitle(title);
         this.status = requireStatus(status);
+        this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
 
-        if (deadline != null){
+        if (deadline != null) {
             validateDeadline(deadline, createdAt);
         }
+
         this.deadline = deadline;
     }
 
-    public static Project create( Clock clock, String title, Instant deadline, ProjectStatus status){
-        Objects.requireNonNull(clock, "clock" );
+    public static Project create(String title, ProjectStatus status, Instant deadline, Clock clock) {
+        Objects.requireNonNull(clock, "clock");
+
         Instant now = clock.instant();
 
-        String normalizedTitle = normalizeAndValidateTitle(title);
-        ProjectStatus st = requireStatus(status);
+        return new Project(
+                null,
+                title,
+                status,
+                deadline,
+                now
+        );
+    }
 
-        if (deadline != null) {
-            validateDeadline(deadline, now);
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = Instant.now();
         }
-
-        return new Project(UUID.randomUUID(), now, normalizedTitle, deadline, st);
-
     }
 
     public UUID getId() { return id; }
-    public Instant getCreatedAt() { return createdAt; }
     public String getTitle() { return title; }
-    public Instant getDeadline() { return deadline; }
     public ProjectStatus getStatus() { return status; }
+    public Instant getDeadline() { return deadline; }
+    public Instant getCreatedAt() { return createdAt; }
 
-    public void rename(String newTitle){
+    public void rename(String newTitle) {
         this.title = normalizeAndValidateTitle(newTitle);
     }
 
-    public void changeStatus(ProjectStatus newStatus){
+    public void changeStatus(ProjectStatus newStatus) {
         this.status = requireStatus(newStatus);
     }
 
-    public void reschedule(Instant newDeadline, Clock clock){
+    public void reschedule(Instant newDeadline, Clock clock) {
         Objects.requireNonNull(clock, "clock");
+
         Instant now = clock.instant();
 
         if (newDeadline != null) {
             validateDeadline(newDeadline, now);
         }
+
         this.deadline = newDeadline;
     }
 
     private static String normalizeAndValidateTitle(String title) {
-        if (title == null) throw new ValidationException("project.title.null", "title must not be null");
+        if (title == null) {
+            throw new ValidationException("project.title.null", "title must not be null");
+        }
+
         String t = title.trim();
-        if (t.isEmpty()) throw new ValidationException("project.title.blank", "title must not be blank");
+
+        if (t.isEmpty()) {
+            throw new ValidationException("project.title.blank", "title must not be blank");
+        }
+
         return t;
     }
 
     private static ProjectStatus requireStatus(ProjectStatus status) {
-        if (status == null) throw new ValidationException("project.status.null", "status must not be null");
+        if (status == null) {
+            throw new ValidationException("project.status.null", "status must not be null");
+        }
+
         return status;
     }
 
     private static void validateDeadline(Instant deadline, Instant now) {
-        if (deadline == null) throw new ValidationException("project.deadline.null", "deadline must not be null");
         if (deadline.isBefore(now)) {
             throw new ValidationException("project.deadline.past", "deadline must be >= now");
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Project other)) return false;
-        return id.equals(other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", status=" + status +
-                ", createdAt=" + createdAt +
-                ", deadline=" + deadline +
-                '}';
     }
 }
