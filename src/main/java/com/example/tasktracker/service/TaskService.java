@@ -35,6 +35,7 @@ public class TaskService {
 
         Task task = Task.create(
                 request.projectId(),
+                request.goalId(),
                 request.title(),
                 request.deadline(),
                 request.status(),

@@ -52,6 +52,7 @@ public class TaskController {
         return new TaskResponse(
                 task.getId(),
                 task.getProjectId(),
+                task.getGoalId(),
                 task.getTitle(),
                 task.getStatus(),
                 task.getDeadline(),

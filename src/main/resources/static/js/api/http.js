@@ -73,4 +73,31 @@ export const api = {
             method: "POST"
         });
     }
+
+    export async function getGoals() {
+        const response = await fetch("/api/goals");
+
+        if (!response.ok) {
+            throw new Error(`Ошибка загрузки целей: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    }
+
+    export async function createGoal(payload) {
+        const response = await fetch("/api/goals", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(responseText || `Ошибка создания цели: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    }
 };

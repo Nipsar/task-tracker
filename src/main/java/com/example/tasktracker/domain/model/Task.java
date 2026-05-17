@@ -21,6 +21,9 @@ public class Task {
     @Column(name = "project_id", nullable = false)
     private UUID projectId;
 
+    @Column(name = "goal_id")
+    private UUID goalId;
+
     @Column(nullable = false)
     private String title;
 
@@ -41,9 +44,18 @@ public class Task {
         // JPA
     }
 
-    private Task(UUID id, UUID projectId, String title, Instant deadline, TaskStatus status, Instant createdAt, Instant completedAt) {
+    private Task(
+            UUID id,
+            UUID projectId,
+            UUID goalId,
+            String title,
+            Instant deadline,
+            TaskStatus status,
+            Instant createdAt
+    ) {
         this.id = id;
         this.projectId = Objects.requireNonNull(projectId, "projectId");
+        this.goalId = goalId;
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
         this.title = normalizeAndValidateTitle(title);
         this.status = requireStatus(status);
@@ -51,11 +63,18 @@ public class Task {
         if (deadline != null) {
             validateDeadline(deadline, createdAt);
         }
+
         this.deadline = deadline;
-        this.completedAt = completedAt;
     }
 
-    public static Task create(UUID projectId, String title, Instant deadline, TaskStatus status, Clock clock) {
+    public static Task create(
+            UUID projectId,
+            UUID goalId,
+            String title,
+            Instant deadline,
+            TaskStatus status,
+            Clock clock
+    ) {
         Objects.requireNonNull(clock, "clock");
         Instant now = clock.instant();
 
@@ -66,9 +85,8 @@ public class Task {
         if (deadline != null) {
             validateDeadline(deadline, now);
         }
-        Instant completedAt = (st == TaskStatus.DONE) ? now : null;
 
-        return new Task(null, projectId, normalizedTitle, deadline, st, now, completedAt);
+        return new Task(null, projectId, goalId, normalizedTitle, deadline, st, now);
     }
 
     @PrePersist
@@ -85,6 +103,7 @@ public class Task {
     public Instant getDeadline() { return deadline; }
     public TaskStatus getStatus() { return status; }
     public Instant getCompletedAt() { return completedAt; }
+    public UUID getGoalId() { return goalId; }
 
     public void rename(String newTitle) {
         this.title = normalizeAndValidateTitle(newTitle);

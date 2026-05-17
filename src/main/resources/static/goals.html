@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цели — Task Tracker</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="page-bg"></div>
+
+<div class="page">
+    <div class="container">
+        <header class="hero">
+            <div>
+                <div class="eyebrow">Goals</div>
+                <h1>Цели и прогресс</h1>
+                <p class="subtitle">
+                    Создавай цели, привязывай к ним задачи и отслеживай процент выполнения.
+                </p>
+            </div>
+
+            <div class="hero-actions">
+                <a href="/" class="secondary-btn nav-link">На дашборд</a>
+                <button id="reloadGoalsBtn" class="primary-btn">Обновить цели</button>
+            </div>
+        </header>
+
+        <section class="panel create-task-panel">
+            <div class="panel-head create-task-head">
+                <div>
+                    <h2>Создать цель</h2>
+                    <p>Форма отправляет POST /api/goals</p>
+                </div>
+            </div>
+
+            <form id="createGoalForm" class="create-task-form">
+                <label class="form-field form-field-wide">
+                    <span>Проект</span>
+                    <select id="goalProjectInput" name="projectId" class="filter-select" required>
+                        <option value="">Загрузка проектов...</option>
+                    </select>
+                </label>
+
+                <label class="form-field form-field-wide">
+                    <span>Название цели</span>
+                    <input
+                            id="goalTitleInput"
+                            name="title"
+                            type="text"
+                            class="filter-input"
+                            placeholder="Например: Спортивное тело"
+                            required
+                    >
+                </label>
+
+                <label class="form-field">
+                    <span>Deadline</span>
+                    <input id="goalDeadlineInput" name="deadline" type="datetime-local" class="filter-input">
+                </label>
+
+                <div class="form-actions">
+                    <button id="createGoalBtn" type="submit" class="primary-btn">Создать цель</button>
+                    <button id="clearGoalFormBtn" type="button" class="secondary-btn">Очистить</button>
+                </div>
+            </form>
+
+            <div id="createGoalMessage" class="form-message" aria-live="polite"></div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card accent-blue">
+                <div class="stat-label">Всего целей</div>
+                <div id="totalGoals" class="stat-value">—</div>
+                <div class="stat-note">Все элементы из /api/goals</div>
+            </article>
+
+            <article class="stat-card accent-green">
+                <div class="stat-label">Средний прогресс</div>
+                <div id="averageGoalProgress" class="stat-value">—</div>
+                <div class="stat-note">Среднее значение по всем целям</div>
+            </article>
+
+            <article class="stat-card accent-orange">
+                <div class="stat-label">Завершённые цели</div>
+                <div id="completedGoals" class="stat-value">—</div>
+                <div class="stat-note">Цели с прогрессом 100%</div>
+            </article>
+
+            <article class="stat-card accent-purple">
+                <div class="stat-label">Задач в целях</div>
+                <div id="goalTasksCount" class="stat-value">—</div>
+                <div class="stat-note">Сумма задач, привязанных к целям</div>
+            </article>
+        </section>
+
+        <section class="panel tasks-panel">
+            <div class="panel-head tasks-head">
+                <div>
+                    <h2>Список целей</h2>
+                    <p id="goalsStatusMessage">Загрузи цели, чтобы увидеть прогресс.</p>
+                </div>
+
+                <div class="filters">
+                    <input
+                            id="goalSearchInput"
+                            type="text"
+                            class="filter-input"
+                            placeholder="Поиск по цели"
+                    >
+
+                    <select id="goalProgressFilter" class="filter-select">
+                        <option value="ALL">Все цели</option>
+                        <option value="ACTIVE">В процессе</option>
+                        <option value="DONE">Завершённые</option>
+                        <option value="EMPTY">Без задач</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="goalsList" class="goal-grid"></div>
+        </section>
+    </div>
+</div>
+
+<script type="module" src="/js/pages/goals-page.js"></script>
+</body>
+</html>
