@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker — Проекты</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="page-bg"></div>
+<div class="page">
+    <div class="container">
+        <nav id="appNav" class="app-nav"></nav>
+
+        <header class="hero">
+            <div>
+                <div class="eyebrow">Task Tracker</div>
+                <h1>Проекты</h1>
+                <p class="subtitle">Создание и просмотр проектов</p>
+            </div>
+            <div class="hero-actions">
+                <button id="loadBtn" class="primary-btn">Обновить проекты</button>
+            </div>
+        </header>
+
+        <section class="panel create-task-panel page-section">
+            <div class="panel-head create-task-head">
+                <div>
+                    <h2>Создать проект</h2>
+                    <p>Форма отправляет POST /api/projects</p>
+                </div>
+            </div>
+
+            <form id="createProjectForm" class="create-task-form">
+                <label class="form-field form-field-wide">
+                    <span>Название проекта</span>
+                    <input id="projectTitleInput" name="title" type="text" class="filter-input" placeholder="Например: Учебный проект" required>
+                </label>
+
+                <label class="form-field">
+                    <span>Статус</span>
+                    <select id="projectStatusInput" name="status" class="filter-select" required>
+                        <option value="NEW">NEW</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="DONE">DONE</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Deadline</span>
+                    <input id="projectDeadlineInput" name="deadline" type="datetime-local" class="filter-input">
+                </label>
+
+                <div class="form-actions">
+                    <button id="createProjectBtn" type="submit" class="primary-btn">Создать проект</button>
+                    <button id="clearProjectFormBtn" type="button" class="secondary-btn">Очистить</button>
+                </div>
+            </form>
+
+            <div id="createProjectMessage" class="form-message" aria-live="polite"></div>
+        </section>
+
+        <section class="panel tasks-panel">
+            <div class="panel-head tasks-head">
+                <div>
+                    <h2>Список проектов</h2>
+                    <p id="statusMessage">Загрузка проектов...</p>
+                </div>
+            </div>
+            <div id="projectList" class="project-grid"></div>
+        </section>
+    </div>
+</div>
+
+<script type="module" src="/js/pages/projects-page.js"></script>
+</body>
+</html>

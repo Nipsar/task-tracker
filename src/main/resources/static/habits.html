@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker — Привычки</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="page-bg"></div>
+<div class="page">
+    <div class="container">
+        <nav id="appNav" class="app-nav"></nav>
+
+        <header class="hero">
+            <div>
+                <div class="eyebrow">Task Tracker</div>
+                <h1>Привычки</h1>
+                <p class="subtitle">Создавай привычки и отмечай выполнение каждый день</p>
+            </div>
+            <div class="hero-actions">
+                <button id="reloadHabitsBtn" type="button" class="primary-btn">Обновить привычки</button>
+            </div>
+        </header>
+
+        <section class="panel habits-panel page-section">
+            <div class="panel-head create-task-head">
+                <div>
+                    <h2>Добавить привычку</h2>
+                    <p>Форма отправляет POST /api/habits</p>
+                </div>
+            </div>
+
+            <form id="createHabitForm" class="create-task-form">
+                <label class="form-field form-field-wide">
+                    <span>Название привычки</span>
+                    <input
+                        id="habitTitleInput"
+                        name="title"
+                        type="text"
+                        class="filter-input"
+                        placeholder="Например: Учить Java 30 минут"
+                        required
+                    >
+                </label>
+
+                <div class="form-actions">
+                    <button id="createHabitBtn" type="submit" class="primary-btn">Добавить привычку</button>
+                    <button id="clearHabitFormBtn" type="button" class="secondary-btn">Очистить</button>
+                </div>
+            </form>
+
+            <div id="createHabitMessage" class="form-message" aria-live="polite"></div>
+        </section>
+
+        <section class="panel tasks-panel">
+            <div class="panel-head tasks-head">
+                <div>
+                    <h2>Мои привычки</h2>
+                    <p>Серия, лучший результат и общее количество выполнений</p>
+                </div>
+            </div>
+            <div id="habitList" class="habit-grid"></div>
+        </section>
+    </div>
+</div>
+
+<script type="module" src="/js/pages/habits-page.js"></script>
+</body>
+</html>

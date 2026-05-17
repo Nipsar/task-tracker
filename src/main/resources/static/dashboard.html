@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker — Дашборд</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/valorant-dashboard.css">
+</head>
+<body>
+<div class="page-bg"></div>
+<div class="page">
+    <div class="container">
+        <nav id="appNav" class="app-nav"></nav>
+
+        <header class="hero">
+            <div>
+                <div class="eyebrow">Task Tracker</div>
+                <h1>Дашборд прогресса</h1>
+                <p class="subtitle">Графики, диаграммы и сводка по задачам из backend</p>
+            </div>
+            <div class="hero-actions">
+                <button id="loadBtn" class="primary-btn">Обновить данные</button>
+            </div>
+        </header>
+
+        <section class="stats-grid">
+            <article class="stat-card accent-blue">
+                <div class="stat-label">Всего задач</div>
+                <div id="totalTasks" class="stat-value">—</div>
+                <div class="stat-note">Все элементы из /api/tasks</div>
+            </article>
+            <article class="stat-card accent-green">
+                <div class="stat-label">Завершено</div>
+                <div id="donePercent" class="stat-value">—</div>
+                <div id="doneDetails" class="stat-note">—</div>
+            </article>
+            <article class="stat-card accent-orange">
+                <div class="stat-label">Просрочено</div>
+                <div id="overdueTasks" class="stat-value">—</div>
+                <div class="stat-note">Учитываются только незавершённые</div>
+            </article>
+            <article class="stat-card accent-purple">
+                <div class="stat-label">Ближайший дедлайн</div>
+                <div id="nearestDeadline" class="stat-value stat-value-sm">—</div>
+                <div id="nearestDeadlineNote" class="stat-note">—</div>
+            </article>
+        </section>
+
+        <section class="dashboard-grid">
+            <article class="panel chart-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Статусы задач</h2>
+                        <p>Круговая диаграмма по NEW / IN_PROGRESS / DONE</p>
+                    </div>
+                </div>
+                <div class="donut-layout">
+                    <div class="donut-wrap">
+                        <div id="statusDonut" class="donut-chart">
+                            <div class="donut-center">
+                                <span id="donutTotal">0</span>
+                                <small>задач</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="statusLegend" class="legend"></div>
+                </div>
+            </article>
+
+            <article class="panel chart-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Дедлайны</h2>
+                        <p>Распределение задач по срочности</p>
+                    </div>
+                </div>
+                <div id="deadlineBars" class="bars"></div>
+            </article>
+
+            <article class="panel chart-panel full-width">
+                <div class="panel-head">
+                    <div>
+                        <h2>Активность за 7 дней</h2>
+                        <p>Сколько задач было выполнено по дням на основе completedAt</p>
+                    </div>
+                </div>
+                <div id="activityChart" class="activity-chart"></div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <p id="statusMessage" class="subtitle">Загрузка данных...</p>
+        </section>
+    </div>
+</div>
+
+<script type="module" src="/js/pages/dashboard-page.js"></script>
+</body>
+</html>
