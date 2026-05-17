@@ -8,8 +8,8 @@ export function normalizeTasks(tasks) {
         deadline: parseDate(task.deadline),
         createdAt: parseDate(task.createdAt),
         completedAt: parseDate(task.completedAt),
-        projectId: task.projectId ?? null
-        goalId: task.goalId ?? null,
+        projectId: task.projectId ?? null,
+        goalId: task.goalId ?? null
     }));
 }
 

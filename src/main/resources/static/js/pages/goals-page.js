@@ -1,13 +1,12 @@
-import { getProjects, getTasks, getGoals, createGoal } from "../api/http.js";
-import { normalizeTasks, normalizeGoals } from "../api/normalizers.js";
-
-import { renderProjectSelect } from "../projects/render-projects.js";
+import { api } from "../api/http.js";
+import { normalizeProjects, normalizeTasks, normalizeGoals } from "../api/normalizers.js";
+import { renderProjectSelect } from "../tasks/render-task-list.js";
 import { renderGoalStats, renderGoalsList } from "../goals/render-goals.js";
 import { buildGoalViewModel, filterGoals, sortGoals } from "../goals/goal-utils.js";
-
 import { showMessage, clearMessage } from "../utils/dom.js";
 import { normalizeErrorMessage } from "../utils/errors.js";
 import { isUuid } from "../utils/validation.js";
+import { initNavigation } from "./common.js";
 
 console.log("goals-page.js loaded");
 
@@ -35,8 +34,9 @@ let allProjects = [];
 let allGoals = [];
 let allTasks = [];
 
+initNavigation("goals");
 reloadGoalsBtn.addEventListener("click", loadGoalsPage);
-createGoalForm.addEventListener("submit", onCreateGoalSubmit);
+const createdGoal = await api.createGoal(payload);
 clearGoalFormBtn.addEventListener("click", resetGoalForm);
 goalSearchInput.addEventListener("input", renderPage);
 goalProgressFilter.addEventListener("change", renderPage);
@@ -48,9 +48,9 @@ async function loadGoalsPage() {
 
     try {
         const [projects, goals, tasks] = await Promise.all([
-            getProjects(),
-            getGoals(),
-            getTasks()
+            api.getProjects(),
+            api.getGoals(),
+            api.getTasks()
         ]);
 
         allProjects = projects;
