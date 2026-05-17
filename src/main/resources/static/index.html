@@ -102,6 +102,49 @@
             <div id="createTaskMessage" class="form-message" aria-live="polite"></div>
         </section>
 
+        <section class="panel habits-panel">
+            <div class="panel-head create-task-head">
+                <div>
+                    <h2>Трекер привычек</h2>
+                    <p>Создавай привычки и отмечай выполнение каждый день</p>
+                </div>
+            </div>
+
+            <form id="createHabitForm" class="create-task-form">
+                <label class="form-field form-field-wide">
+                    <span>Название привычки</span>
+                    <input
+                            id="habitTitleInput"
+                            name="title"
+                            type="text"
+                            class="filter-input"
+                            placeholder="Например: Учить Java 30 минут"
+                            required
+                    >
+                </label>
+
+                <div class="form-actions">
+                    <button id="createHabitBtn" type="submit" class="primary-btn">
+                        Добавить привычку
+                    </button>
+                    <button id="clearHabitFormBtn" type="button" class="secondary-btn">
+                        Очистить
+                    </button>
+                </div>
+            </form>
+
+            <div id="createHabitMessage" class="form-message" aria-live="polite"></div>
+
+            <div class="habit-list-head">
+                <h3>Мои привычки</h3>
+                <button id="reloadHabitsBtn" type="button" class="secondary-btn">
+                    Обновить привычки
+                </button>
+            </div>
+
+            <div id="habitList" class="habit-grid"></div>
+        </section>
+
         <section class="stats-grid">
             <article class="stat-card accent-blue">
                 <div class="stat-label">Всего задач</div>

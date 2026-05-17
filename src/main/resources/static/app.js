@@ -35,14 +35,61 @@ const createProjectBtn = document.getElementById("createProjectBtn");
 const clearProjectFormBtn = document.getElementById("clearProjectFormBtn");
 const createProjectMessage = document.getElementById("createProjectMessage");
 
+const createHabitForm = document.getElementById("createHabitForm");
+const habitTitleInput = document.getElementById("habitTitleInput");
+const createHabitBtn = document.getElementById("createHabitBtn");
+const clearHabitFormBtn = document.getElementById("clearHabitFormBtn");
+const createHabitMessage = document.getElementById("createHabitMessage");
+const reloadHabitsBtn = document.getElementById("reloadHabitsBtn");
+const habitList = document.getElementById("habitList");
 
 
 let allTasks = [];
 let allProjects = [];
-
+let allHabits = [];
 
 
 const taskApi = {
+
+    async getHabits() {
+        const response = await fetch("/api/habits");
+
+        if (!response.ok) {
+            throw new Error(`Ошибка загрузки привычек: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    },
+
+    async createHabit(payload) {
+        const response = await fetch("/api/habits", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(responseText || `Ошибка создания привычки: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    },
+
+    async completeHabit(habitId) {
+        const response = await fetch(`/api/habits/${habitId}/complete`, {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(responseText || `Ошибка выполнения привычки: HTTP ${response.status}`);
+        }
+
+        return response.json();
+    },
 
     async createProject(payload) {
         const response = await fetch("/api/projects", {
@@ -347,10 +394,25 @@ if (resetTaskFormBtn) {
     resetTaskFormBtn.addEventListener("click", resetCreateTaskForm);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadProjects();
-    loadTasks();
+if (createHabitForm) {
+    createHabitForm.addEventListener("submit", onCreateHabitSubmit);
+}
+
+if (clearHabitFormBtn) {
+    clearHabitFormBtn.addEventListener("click", resetCreateHabitForm);
+}
+
+if (reloadHabitsBtn) {
+    reloadHabitsBtn.addEventListener("click", loadHabits);
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadProjects();
+    await loadTasks();
+    loadHabits();
 });
+
+
 
 async function loadTasks() {
     setLoadingState(true);
@@ -389,6 +451,11 @@ async function loadProjects() {
         renderProjectSelect([]);
         showCreateTaskMessage("Не удалось загрузить проекты. Проверь /api/projects.", "error");
     }
+}
+
+function getProjectTitleById(projectId) {
+    const project = allProjects.find(project => project.id === projectId);
+    return project ? project.title : "Проект не найден";
 }
 
 function renderProjectSelect(projects) {
@@ -836,8 +903,8 @@ function renderVisibleTasks() {
 
             <div class="task-meta-grid">
                 <div class="task-meta-item">
-                    <span class="task-meta-label">Project ID</span>
-                    <strong>${escapeHtml(task.projectId ?? "—")}</strong>
+                    <span class="task-meta-label">Проект</span>
+                    <strong>${escapeHtml(getProjectTitleById(task.projectId))}</strong>
                 </div>
                 <div class="task-meta-item">
                     <span class="task-meta-label">Deadline</span>
@@ -944,4 +1011,212 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
+async function loadHabits() {
+    if (!habitList) {
+        return;
+    }
+
+    try {
+        allHabits = await taskApi.getHabits();
+        renderHabits(allHabits);
+
+        if (allHabits.length === 0) {
+            showCreateHabitMessage("Привычек пока нет. Добавь первую.", "success");
+        } else {
+            clearCreateHabitMessage();
+        }
+    } catch (error) {
+        console.error(error);
+        allHabits = [];
+        renderHabits([]);
+        showCreateHabitMessage(normalizeErrorMessage(error), "error");
+    }
+}
+
+async function onCreateHabitSubmit(event) {
+    event.preventDefault();
+    clearCreateHabitMessage();
+
+    const title = habitTitleInput?.value.trim() ?? "";
+
+    if (!title) {
+        showCreateHabitMessage("Название привычки обязательно.", "error");
+        return;
+    }
+
+    const payload = {
+        title
+    };
+
+    setCreateHabitLoading(true);
+
+    try {
+        const createdHabit = await taskApi.createHabit(payload);
+
+        resetCreateHabitForm();
+        showCreateHabitMessage(`Привычка создана: ${createdHabit.title}`, "success");
+
+        await loadHabits();
+    } catch (error) {
+        console.error(error);
+        showCreateHabitMessage(normalizeErrorMessage(error), "error");
+    } finally {
+        setCreateHabitLoading(false);
+    }
+}
+
+async function onHabitComplete(habitId, button) {
+    const previousText = button.textContent;
+
+    button.disabled = true;
+    button.textContent = "Сохраняю...";
+
+    try {
+        const updatedHabit = await taskApi.completeHabit(habitId);
+
+        allHabits = allHabits.map(habit =>
+            habit.id === habitId ? updatedHabit : habit
+        );
+
+        renderHabits(allHabits);
+        showCreateHabitMessage(`Готово: ${updatedHabit.title}`, "success");
+    } catch (error) {
+        console.error(error);
+        showCreateHabitMessage(normalizeErrorMessage(error), "error");
+
+        button.disabled = false;
+        button.textContent = previousText;
+    }
+}
+
+function renderHabits(habits) {
+    if (!habitList) {
+        return;
+    }
+
+    habitList.innerHTML = "";
+
+    if (!habits || habits.length === 0) {
+        habitList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-title">Привычек пока нет</div>
+                <div class="empty-text">Добавь привычку выше и отмечай её каждый день.</div>
+            </div>
+        `;
+        return;
+    }
+
+    const todayKey = toLocalDateKey(new Date());
+
+    const sortedHabits = [...habits].sort((a, b) => {
+        const streakDiff = Number(b.streakDays ?? 0) - Number(a.streakDays ?? 0);
+
+        if (streakDiff !== 0) {
+            return streakDiff;
+        }
+
+        return String(a.title ?? "").localeCompare(String(b.title ?? ""), "ru");
+    });
+
+    sortedHabits.forEach(habit => {
+        const card = document.createElement("article");
+        card.className = "habit-card";
+
+        const lastCompletedDate = habit.lastCompletedDate ?? null;
+        const isCompletedToday = lastCompletedDate === todayKey;
+
+        card.innerHTML = `
+            <div class="habit-top">
+                <div>
+                    <h3>${escapeHtml(habit.title)}</h3>
+                    <div class="task-id">${escapeHtml(habit.id)}</div>
+                </div>
+                <div class="habit-streak-badge">
+                    🔥 ${Number(habit.streakDays ?? 0)} дн.
+                </div>
+            </div>
+
+            <div class="habit-meta-grid">
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Серия</span>
+                    <strong>${Number(habit.streakDays ?? 0)} дней подряд</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Лучший результат</span>
+                    <strong>${Number(habit.bestStreakDays ?? 0)} дней</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Всего выполнено</span>
+                    <strong>${Number(habit.totalCompletions ?? 0)}</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Последнее выполнение</span>
+                    <strong>${escapeHtml(lastCompletedDate ?? "—")}</strong>
+                </div>
+            </div>
+
+            <div class="task-actions">
+                <button
+                        type="button"
+                        class="primary-btn habit-complete-btn"
+                        ${isCompletedToday ? "disabled" : ""}
+                >
+                    ${isCompletedToday ? "Сегодня выполнено" : "Выполнено сегодня"}
+                </button>
+            </div>
+        `;
+
+        const completeBtn = card.querySelector(".habit-complete-btn");
+
+        completeBtn.addEventListener("click", () => {
+            onHabitComplete(habit.id, completeBtn);
+        });
+
+        habitList.appendChild(card);
+    });
+}
+
+function setCreateHabitLoading(isLoading) {
+    if (!createHabitBtn) {
+        return;
+    }
+
+    createHabitBtn.disabled = isLoading;
+    createHabitBtn.textContent = isLoading ? "Создание..." : "Добавить привычку";
+
+    if (habitTitleInput) {
+        habitTitleInput.disabled = isLoading;
+    }
+
+    if (clearHabitFormBtn) {
+        clearHabitFormBtn.disabled = isLoading;
+    }
+}
+
+function resetCreateHabitForm() {
+    if (!createHabitForm) {
+        return;
+    }
+
+    createHabitForm.reset();
+    clearCreateHabitMessage();
+}
+
+function showCreateHabitMessage(message, type) {
+    if (!createHabitMessage) {
+        return;
+    }
+
+    createHabitMessage.textContent = message;
+    createHabitMessage.className = `form-message ${type}`;
+}
+
+function clearCreateHabitMessage() {
+    if (!createHabitMessage) {
+        return;
+    }
+
+    createHabitMessage.textContent = "";
+    createHabitMessage.className = "form-message";
+}
 

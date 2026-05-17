@@ -674,3 +674,69 @@ h1 {
         min-width: 190px;
     }
 }
+
+.habits-panel {
+    margin-top: 24px;
+}
+
+.habit-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+.habit-list-head h3 {
+    margin: 0;
+}
+
+.habit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.habit-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.habit-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.habit-top h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.habit-streak-badge {
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.habit-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.habit-complete-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
