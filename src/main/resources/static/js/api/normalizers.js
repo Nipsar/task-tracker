@@ -3,13 +3,13 @@ import { parseDate } from "../utils/date.js";
 export function normalizeTasks(tasks) {
     return (tasks ?? []).map(task => ({
         id: task.id,
+        projectId: task.projectId ?? null,
+        goalId: task.goalId ?? null,
         title: String(task.title ?? "Без названия").trim(),
         status: String(task.status ?? "NEW"),
         deadline: parseDate(task.deadline),
         createdAt: parseDate(task.createdAt),
-        completedAt: parseDate(task.completedAt),
-        projectId: task.projectId ?? null,
-        goalId: task.goalId ?? null
+        completedAt: parseDate(task.completedAt)
     }));
 }
 
@@ -23,6 +23,23 @@ export function normalizeProjects(projects) {
     }));
 }
 
+export function normalizeGoals(goals) {
+    return (goals ?? []).map(normalizeGoal);
+}
+
+export function normalizeGoal(goal) {
+    return {
+        id: goal.id,
+        projectId: goal.projectId ?? null,
+        title: String(goal.title ?? "Без названия").trim(),
+        deadline: parseDate(goal.deadline),
+        createdAt: parseDate(goal.createdAt),
+        totalTasks: Number(goal.totalTasks ?? 0),
+        doneTasks: Number(goal.doneTasks ?? 0),
+        progressPercent: Number(goal.progressPercent ?? 0)
+    };
+}
+
 export function normalizeHabits(habits) {
     return (habits ?? []).map(habit => ({
         id: habit.id,
@@ -33,21 +50,4 @@ export function normalizeHabits(habits) {
         lastCompletedDate: habit.lastCompletedDate ?? null,
         createdAt: parseDate(habit.createdAt)
     }));
-}
-
-export function normalizeGoal(goal) {
-    return {
-        id: goal.id,
-        projectId: goal.projectId ?? null,
-        title: String(goal.title ?? "Без названия").trim(),
-        deadline: goal.deadline ? new Date(goal.deadline) : null,
-        createdAt: goal.createdAt ? new Date(goal.createdAt) : null,
-        totalTasks: Number(goal.totalTasks ?? 0),
-        doneTasks: Number(goal.doneTasks ?? 0),
-        progressPercent: Number(goal.progressPercent ?? 0)
-    };
-}
-
-export function normalizeGoals(goals) {
-    return goals.map(normalizeGoal);
 }

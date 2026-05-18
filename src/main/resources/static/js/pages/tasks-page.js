@@ -1,5 +1,4 @@
 import { api } from "../api/http.js";
-import { normalizeProjects, normalizeTasks } from "../api/normalizers.js";
 import { clearMessage, showMessage } from "../utils/dom.js";
 import { normalizeErrorMessage } from "../utils/errors.js";
 import { isValidLocalDateTime, toIsoOrNull } from "../utils/date.js";
@@ -7,10 +6,12 @@ import { isUuid } from "../utils/validation.js";
 import { filterTasks } from "../tasks/task-utils.js";
 import { renderProjectSelect, renderTaskList } from "../tasks/render-task-list.js";
 import { initNavigation } from "./common.js";
+import { normalizeGoals, normalizeProjects, normalizeTasks } from "../api/normalizers.js";
 
 const state = {
     tasks: [],
-    projects: []
+    projects: [],
+    goals: []
 };
 
 const elements = {
@@ -21,6 +22,7 @@ const elements = {
     statusFilter: document.getElementById("statusFilter"),
     form: document.getElementById("createTaskForm"),
     projectSelect: document.getElementById("projectSelectInput"),
+    goalSelect: document.getElementById("goalSelectInput"),
     titleInput: document.getElementById("titleInput"),
     statusInput: document.getElementById("createStatusInput"),
     deadlineInput: document.getElementById("deadlineInput"),
@@ -40,22 +42,36 @@ function bindEvents() {
     elements.statusFilter?.addEventListener("change", renderVisibleTasks);
     elements.form?.addEventListener("submit", onCreateTaskSubmit);
     elements.clearButton?.addEventListener("click", resetForm);
+    elements.projectSelect?.addEventListener("change", renderGoalSelectForSelectedProject);
 }
 
 async function initPage() {
-    await loadProjects();
+    await loadProjectsAndGoals();
     await loadTasks();
 }
 
-async function loadProjects() {
+async function loadProjectsAndGoals() {
     try {
-        state.projects = normalizeProjects(await api.getProjects());
+        const [projects, goals] = await Promise.all([
+            api.getProjects(),
+            api.getGoals()
+        ]);
+
+        state.projects = normalizeProjects(projects);
+        state.goals = normalizeGoals(goals);
+
         renderProjectSelect(elements.projectSelect, state.projects);
+        renderGoalSelectForSelectedProject();
     } catch (error) {
         console.error(error);
+
         state.projects = [];
+        state.goals = [];
+
         renderProjectSelect(elements.projectSelect, []);
-        showMessage(elements.formMessage, "Не удалось загрузить проекты. Проверь /api/projects.", "error");
+        renderGoalSelectForSelectedProject();
+
+        showMessage(elements.formMessage, "Не удалось загрузить проекты или цели.", "error");
     }
 }
 
@@ -112,6 +128,7 @@ async function onCreateTaskSubmit(event) {
     try {
         const createdTask = await api.createTask({
             projectId: formData.projectId,
+            goalId: formData.goalId || null,
             title: formData.title,
             status: formData.status,
             deadline: toIsoOrNull(formData.deadline)
@@ -169,6 +186,7 @@ async function onTaskDelete(taskId, button) {
 function getFormData() {
     return {
         projectId: elements.projectSelect?.value ?? "",
+        goalId: elements.goalSelect?.value ?? "",
         title: elements.titleInput?.value.trim() ?? "",
         status: elements.statusInput?.value ?? "NEW",
         deadline: elements.deadlineInput?.value ?? ""
@@ -177,6 +195,7 @@ function getFormData() {
 
 function validateFormData(data) {
     if (!isUuid(data.projectId)) return "Выбери проект из списка.";
+    if (data.goalId && !isUuid(data.goalId)) { return "Некорректная цель."; }
     if (!data.title) return "Название задачи обязательно.";
     if (!data.status) return "Статус обязателен.";
     if (!isValidLocalDateTime(data.deadline)) return "Некорректный deadline.";
@@ -190,6 +209,7 @@ function resetForm() {
         elements.statusInput.value = "NEW";
     }
 
+    renderGoalSelectForSelectedProject();
     clearMessage(elements.formMessage);
 }
 
@@ -214,4 +234,36 @@ function setFormLoading(isLoading) {
     elements.statusInput.disabled = isLoading;
     elements.deadlineInput.disabled = isLoading;
     elements.clearButton.disabled = isLoading;
+
+    if (elements.goalSelect) {
+        elements.goalSelect.disabled = isLoading || !isUuid(elements.projectSelect?.value ?? "");
+    }
+}
+
+function renderGoalSelectForSelectedProject() {
+    if (!elements.goalSelect) return;
+
+    const selectedProjectId = elements.projectSelect?.value ?? "";
+
+    if (!isUuid(selectedProjectId)) {
+        elements.goalSelect.innerHTML = `<option value="">Сначала выбери проект</option>`;
+        elements.goalSelect.disabled = true;
+        return;
+    }
+
+    const projectGoals = state.goals.filter(goal => goal.projectId === selectedProjectId);
+
+    if (projectGoals.length === 0) {
+        elements.goalSelect.innerHTML = `<option value="">У проекта пока нет целей</option>`;
+        elements.goalSelect.disabled = false;
+        return;
+    }
+
+    elements.goalSelect.disabled = false;
+    elements.goalSelect.innerHTML = `
+        <option value="">Без цели</option>
+        ${projectGoals.map(goal => `
+            <option value="${goal.id}">${goal.title}</option>
+        `).join("")}
+    `;
 }

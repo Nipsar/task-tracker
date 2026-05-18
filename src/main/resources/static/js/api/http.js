@@ -3,9 +3,9 @@ async function requestJson(path, options = {}) {
 
     const response = await fetch(path, {
         method,
-        headers: body === undefined
-            ? undefined
-            : { "Content-Type": "application/json" },
+        headers: body === undefined ? undefined : {
+            "Content-Type": "application/json"
+        },
         body: body === undefined ? undefined : JSON.stringify(body)
     });
 
@@ -57,6 +57,17 @@ export const api = {
         });
     },
 
+    getGoals() {
+        return requestJson("/api/goals");
+    },
+
+    createGoal(payload) {
+        return requestJson("/api/goals", {
+            method: "POST",
+            body: payload
+        });
+    },
+
     getHabits() {
         return requestJson("/api/habits");
     },
@@ -72,16 +83,18 @@ export const api = {
         return requestJson(`/api/habits/${habitId}/complete`, {
             method: "POST"
         });
-    },
-
-    getGoals() {
-        return requestJson("/api/goals");
-    },
-
-    createGoal(payload) {
-        return requestJson("/api/goals", {
-            method: "POST",
-            body: payload
-        });
     }
 };
+
+export const getTasks = () => api.getTasks();
+export const createTask = (payload) => api.createTask(payload);
+
+export const getProjects = () => api.getProjects();
+export const createProject = (payload) => api.createProject(payload);
+
+export const getGoals = () => api.getGoals();
+export const createGoal = (payload) => api.createGoal(payload);
+
+export const getHabits = () => api.getHabits();
+export const createHabit = (payload) => api.createHabit(payload);
+export const completeHabit = (habitId) => api.completeHabit(habitId);

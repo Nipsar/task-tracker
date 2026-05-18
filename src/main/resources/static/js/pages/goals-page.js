@@ -36,10 +36,11 @@ let allTasks = [];
 
 initNavigation("goals");
 reloadGoalsBtn.addEventListener("click", loadGoalsPage);
-const createdGoal = await api.createGoal(payload);
+createGoalForm.addEventListener("submit", onCreateGoalSubmit);
 clearGoalFormBtn.addEventListener("click", resetGoalForm);
 goalSearchInput.addEventListener("input", renderPage);
 goalProgressFilter.addEventListener("change", renderPage);
+
 
 document.addEventListener("DOMContentLoaded", loadGoalsPage);
 
@@ -119,7 +120,7 @@ async function onCreateGoalSubmit(event) {
     setCreateGoalLoading(true);
 
     try {
-        const createdGoal = await createGoal(payload);
+        const createdGoal = await api.createGoal(payload);
 
         resetGoalForm();
         showMessage(createGoalMessage, `Цель создана: ${createdGoal.title}`, "success");
