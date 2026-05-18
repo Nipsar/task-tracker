@@ -18,7 +18,7 @@ public class Goal {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "project_id", nullable = false)
+    @Column(name = "project_id")
     private UUID projectId;
 
     @Column(nullable = false)
@@ -35,7 +35,7 @@ public class Goal {
     }
 
     private Goal(UUID projectId, String title, Instant deadline, Instant createdAt) {
-        this.projectId = Objects.requireNonNull(projectId, "projectId");
+        this.projectId = projectId;
         this.title = normalizeAndValidateTitle(title);
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
 

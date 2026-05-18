@@ -18,7 +18,7 @@ public class Task {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "project_id", nullable = false)
+    @Column(name = "project_id")
     private UUID projectId;
 
     @Column(name = "goal_id")
@@ -54,7 +54,7 @@ public class Task {
             Instant createdAt
     ) {
         this.id = id;
-        this.projectId = Objects.requireNonNull(projectId, "projectId");
+        this.projectId = projectId;
         this.goalId = goalId;
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
         this.title = normalizeAndValidateTitle(title);
@@ -78,7 +78,6 @@ public class Task {
         Objects.requireNonNull(clock, "clock");
         Instant now = clock.instant();
 
-        Objects.requireNonNull(projectId, "projectId");
         String normalizedTitle = normalizeAndValidateTitle(title);
         TaskStatus st = requireStatus(status);
 
