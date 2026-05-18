@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record TaskCreateRequest(
-        @NotNull UUID projectId,
+        UUID projectId,
         UUID goalId,
         @NotBlank String title,
         Instant deadline,

@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record GoalCreateRequest(
-        @NotNull UUID projectId,
+        UUID projectId,
         @NotBlank String title,
         Instant deadline
 ) {

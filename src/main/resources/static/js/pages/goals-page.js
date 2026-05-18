@@ -136,15 +136,15 @@ async function onCreateGoalSubmit(event) {
 
 function getGoalFormData() {
     return {
-        projectId: goalProjectInput?.value ?? "",
+        projectId: goalProjectInput?.value || null,
         title: goalTitleInput?.value.trim() ?? "",
         deadline: goalDeadlineInput?.value ?? ""
     };
 }
 
 function validateGoalFormData(data) {
-    if (!isUuid(data.projectId)) {
-        return "Нужно выбрать проект.";
+    if (data.projectId && !isUuid(data.projectId)) {
+        return "Некорректный проект.";
     }
 
     if (!data.title) {

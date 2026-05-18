@@ -30,8 +30,10 @@ public class TaskService {
     }
 
     public Task create(TaskCreateRequest request) {
-        projectRepository.findById(request.projectId())
-                .orElseThrow(() -> new NotFoundException("Project not found: " + request.projectId()));
+        if (request.projectId() != null) {
+            projectRepository.findById(request.projectId())
+                    .orElseThrow(() -> new NotFoundException("Project not found: " + request.projectId()));
+        }
 
         Task task = Task.create(
                 request.projectId(),

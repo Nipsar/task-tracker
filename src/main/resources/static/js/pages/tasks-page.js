@@ -185,8 +185,8 @@ async function onTaskDelete(taskId, button) {
 
 function getFormData() {
     return {
-        projectId: elements.projectSelect?.value ?? "",
-        goalId: elements.goalSelect?.value ?? "",
+        projectId: elements.projectSelect?.value || null,
+        goalId: elements.goalSelect?.value || null,
         title: elements.titleInput?.value.trim() ?? "",
         status: elements.statusInput?.value ?? "NEW",
         deadline: elements.deadlineInput?.value ?? ""
@@ -194,11 +194,26 @@ function getFormData() {
 }
 
 function validateFormData(data) {
-    if (!isUuid(data.projectId)) return "Выбери проект из списка.";
-    if (data.goalId && !isUuid(data.goalId)) { return "Некорректная цель."; }
-    if (!data.title) return "Название задачи обязательно.";
-    if (!data.status) return "Статус обязателен.";
-    if (!isValidLocalDateTime(data.deadline)) return "Некорректный deadline.";
+    if (data.projectId && !isUuid(data.projectId)) {
+        return "Некорректный проект.";
+    }
+
+    if (data.goalId && !isUuid(data.goalId)) {
+        return "Некорректная цель.";
+    }
+
+    if (!data.title) {
+        return "Название задачи обязательно.";
+    }
+
+    if (!data.status) {
+        return "Статус обязателен.";
+    }
+
+    if (!isValidLocalDateTime(data.deadline)) {
+        return "Некорректный deadline.";
+    }
+
     return null;
 }
 
@@ -236,33 +251,28 @@ function setFormLoading(isLoading) {
     elements.clearButton.disabled = isLoading;
 
     if (elements.goalSelect) {
-        elements.goalSelect.disabled = isLoading || !isUuid(elements.projectSelect?.value ?? "");
+        elements.goalSelect.disabled = isLoading;
     }
 }
 
 function renderGoalSelectForSelectedProject() {
     if (!elements.goalSelect) return;
 
-    const selectedProjectId = elements.projectSelect?.value ?? "";
+    const selectedProjectId = elements.projectSelect?.value || null;
 
-    if (!isUuid(selectedProjectId)) {
-        elements.goalSelect.innerHTML = `<option value="">Сначала выбери проект</option>`;
-        elements.goalSelect.disabled = true;
-        return;
-    }
+    let visibleGoals = state.goals;
 
-    const projectGoals = state.goals.filter(goal => goal.projectId === selectedProjectId);
-
-    if (projectGoals.length === 0) {
-        elements.goalSelect.innerHTML = `<option value="">У проекта пока нет целей</option>`;
-        elements.goalSelect.disabled = false;
-        return;
+    if (selectedProjectId) {
+        visibleGoals = state.goals.filter(
+            goal => goal.projectId === selectedProjectId
+        );
     }
 
     elements.goalSelect.disabled = false;
+
     elements.goalSelect.innerHTML = `
         <option value="">Без цели</option>
-        ${projectGoals.map(goal => `
+        ${visibleGoals.map(goal => `
             <option value="${goal.id}">${goal.title}</option>
         `).join("")}
     `;
