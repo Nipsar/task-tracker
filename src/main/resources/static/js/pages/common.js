@@ -7,15 +7,21 @@ export function initNavigation(activePage) {
 
     const items = [
         { page: "dashboard", title: "Дашборд", href: "/dashboard.html" },
+        { page: "today", title: "Сегодня", href: "/today.html" },
         { page: "tasks", title: "Задачи", href: "/tasks.html" },
         { page: "projects", title: "Проекты", href: "/projects.html" },
         { page: "habits", title: "Привычки", href: "/habits.html" },
         { page: "goals", title: "Цели", href: "/goals.html" }
     ];
 
-    nav.innerHTML = items.map(item => `
-        <a class="nav-link ${item.page === activePage ? "active" : ""}" href="${item.href}">
-            ${item.title}
-        </a>
-    `).join("");
+    nav.innerHTML = items
+        .map(item => `
+            <a
+                class="nav-link ${item.page === activePage ? "active" : ""}"
+                href="${item.href}"
+            >
+                ${item.title}
+            </a>
+        `)
+        .join("");
 }

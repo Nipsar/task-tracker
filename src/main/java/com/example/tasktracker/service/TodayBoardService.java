@@ -11,6 +11,7 @@ import com.example.tasktracker.repository.HabitRepository;
 import com.example.tasktracker.repository.ProjectRepository;
 import com.example.tasktracker.repository.TaskRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -47,16 +48,17 @@ public class TodayBoardService {
         this.clock = Clock.systemUTC();
     }
 
-    public TodayBoardResponse getTodayBoard(LocalDate requestedDate) {
-        LocalDate date = requestedDate != null
-                ? requestedDate
-                : LocalDate.now(clock);
+    @Transactional(readOnly = true)
+    public TodayBoardResponse getTodayBoard() {
+        LocalDate today = LocalDate.now(clock);
 
-        Instant startOfDay = date.atStartOfDay().toInstant(ZoneOffset.UTC);
-        Instant endOfDay = date.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant startOfDay = today.atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant endOfDay = today.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
 
-        List<Task> activeDueTasks = taskRepository
-                .findByDeadlineLessThanAndStatusNot(endOfDay, TaskStatus.DONE);
+        List<Task> activeDueTasks = taskRepository.findByDeadlineLessThanAndStatusNot(
+                endOfDay,
+                TaskStatus.DONE
+        );
 
         List<Task> completedTodayTasks = taskRepository
                 .findByCompletedAtGreaterThanEqualAndCompletedAtLessThanAndStatus(
@@ -65,15 +67,12 @@ public class TodayBoardService {
                         TaskStatus.DONE
                 );
 
-        List<Task> todayTasks = mergeTasks(
-                activeDueTasks,
-                completedTodayTasks
-        );
-
+        List<Task> todayTasks = mergeTasks(activeDueTasks, completedTodayTasks);
         List<Habit> habits = habitRepository.findAll();
         List<Goal> goals = goalRepository.findAll();
 
         Map<UUID, String> projectTitlesById = loadProjectTitles(todayTasks, goals);
+
         Map<UUID, String> goalTitlesById = goals.stream()
                 .collect(Collectors.toMap(
                         Goal::getId,
@@ -99,7 +98,7 @@ public class TodayBoardService {
                 .toList();
 
         List<TodayBoardResponse.HabitItem> habitItems = habits.stream()
-                .map(habit -> toHabitItem(habit, date))
+                .map(habit -> toHabitItem(habit, today))
                 .sorted(Comparator.comparing(TodayBoardResponse.HabitItem::title))
                 .toList();
 
@@ -108,34 +107,14 @@ public class TodayBoardService {
                 .sorted(Comparator.comparing(TodayBoardResponse.GoalItem::title))
                 .toList();
 
-        int doneTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::completedToday)
-                .count();
-
-        int overdueTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::overdue)
-                .count();
-
-        int dueTodayTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::dueToday)
-                .count();
-
-        int completedHabits = (int) habitItems.stream()
-                .filter(TodayBoardResponse.HabitItem::completedToday)
-                .count();
-
-        TodayBoardResponse.Summary summary = new TodayBoardResponse.Summary(
-                taskItems.size(),
-                doneTasks,
-                overdueTasks,
-                dueTodayTasks,
-                habitItems.size(),
-                completedHabits,
-                goalItems.size()
+        TodayBoardResponse.Summary summary = buildSummary(
+                taskItems,
+                habitItems,
+                goalItems
         );
 
         return new TodayBoardResponse(
-                date,
+                today,
                 taskItems,
                 habitItems,
                 goalItems,
@@ -149,10 +128,8 @@ public class TodayBoardService {
     ) {
         Map<UUID, Task> tasksById = new LinkedHashMap<>();
 
-        Stream.concat(
-                activeDueTasks.stream(),
-                completedTodayTasks.stream()
-        ).forEach(task -> tasksById.put(task.getId(), task));
+        Stream.concat(activeDueTasks.stream(), completedTodayTasks.stream())
+                .forEach(task -> tasksById.put(task.getId(), task));
 
         return new ArrayList<>(tasksById.values());
     }
@@ -220,9 +197,9 @@ public class TodayBoardService {
 
     private TodayBoardResponse.HabitItem toHabitItem(
             Habit habit,
-            LocalDate date
+            LocalDate today
     ) {
-        boolean completedToday = date.equals(habit.getLastCompletedDate());
+        boolean completedToday = today.equals(habit.getLastCompletedDate());
 
         return new TodayBoardResponse.HabitItem(
                 habit.getId(),
@@ -241,6 +218,7 @@ public class TodayBoardService {
             Map<UUID, String> projectTitlesById
     ) {
         long totalTasks = taskRepository.countByGoalId(goal.getId());
+
         long doneTasks = taskRepository.countByGoalIdAndStatus(
                 goal.getId(),
                 TaskStatus.DONE
@@ -260,6 +238,38 @@ public class TodayBoardService {
                 totalTasks,
                 doneTasks,
                 progressPercent
+        );
+    }
+
+    private TodayBoardResponse.Summary buildSummary(
+            List<TodayBoardResponse.TaskItem> taskItems,
+            List<TodayBoardResponse.HabitItem> habitItems,
+            List<TodayBoardResponse.GoalItem> goalItems
+    ) {
+        int doneTasks = (int) taskItems.stream()
+                .filter(TodayBoardResponse.TaskItem::completedToday)
+                .count();
+
+        int overdueTasks = (int) taskItems.stream()
+                .filter(TodayBoardResponse.TaskItem::overdue)
+                .count();
+
+        int dueTodayTasks = (int) taskItems.stream()
+                .filter(TodayBoardResponse.TaskItem::dueToday)
+                .count();
+
+        int completedHabits = (int) habitItems.stream()
+                .filter(TodayBoardResponse.HabitItem::completedToday)
+                .count();
+
+        return new TodayBoardResponse.Summary(
+                taskItems.size(),
+                doneTasks,
+                overdueTasks,
+                dueTodayTasks,
+                habitItems.size(),
+                completedHabits,
+                goalItems.size()
         );
     }
 }
