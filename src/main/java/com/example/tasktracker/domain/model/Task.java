@@ -37,7 +37,7 @@ public class Task {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "completed_at", nullable = false)
+    @Column(name = "completed_at")
     private Instant completedAt;
 
     protected Task() {

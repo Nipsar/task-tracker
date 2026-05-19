@@ -23,7 +23,14 @@ class TaskInvariantTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> Task.create(UUID.randomUUID(), "   ", now.plusSeconds(60), TaskStatus.NEW, clock)
+                () -> Task.create(
+                        UUID.randomUUID(),
+                        null,
+                        "   ",
+                        now.plusSeconds(60),
+                        TaskStatus.NEW,
+                        clock
+                )
         );
 
         assertEquals("task.title.blank", ex.getCode());
@@ -36,7 +43,14 @@ class TaskInvariantTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> Task.create(UUID.randomUUID(), "Ok", now.minusSeconds(1), TaskStatus.NEW, clock)
+                () -> Task.create(
+                        UUID.randomUUID(),
+                        null,
+                        "Ok",
+                        now.minusSeconds(1),
+                        TaskStatus.NEW,
+                        clock
+                )
         );
 
         assertEquals("task.deadline.past", ex.getCode());
@@ -49,7 +63,14 @@ class TaskInvariantTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> Task.create(UUID.randomUUID(), "Ok", now.plusSeconds(60), null, clock)
+                () -> Task.create(
+                        UUID.randomUUID(),
+                        null,
+                        "Ok",
+                        now.plusSeconds(60),
+                        null,
+                        clock
+                )
         );
 
         assertEquals("task.status.null", ex.getCode());

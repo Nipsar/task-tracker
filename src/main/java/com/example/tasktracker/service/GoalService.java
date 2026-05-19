@@ -1,7 +1,7 @@
 package com.example.tasktracker.service;
 
-import com.example.tasktracker.api.GoalCreateRequest;
-import com.example.tasktracker.api.GoalResponse;
+import com.example.tasktracker.api.goal.GoalCreateRequest;
+import com.example.tasktracker.api.goal.GoalResponse;
 import com.example.tasktracker.domain.exception.NotFoundException;
 import com.example.tasktracker.domain.model.Goal;
 import com.example.tasktracker.domain.model.TaskStatus;

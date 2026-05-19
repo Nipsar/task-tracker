@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.goal;
 
 import com.example.tasktracker.service.GoalService;
 import jakarta.validation.Valid;

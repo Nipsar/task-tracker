@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.common;
 
 import com.example.tasktracker.domain.exception.DomainException;
 import com.example.tasktracker.domain.exception.NotFoundException;

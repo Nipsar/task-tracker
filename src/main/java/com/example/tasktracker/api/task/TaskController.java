@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.task;
 
 import com.example.tasktracker.domain.model.Task;
 import com.example.tasktracker.service.TaskService;
@@ -34,7 +34,7 @@ public class TaskController {
     }
 
     @PostMapping("/api/tasks")
-    public TaskResponse createTask(@Valid @RequestBody com.example.tasktracker.api.TaskCreateRequest request) {
+    public TaskResponse createTask(@Valid @RequestBody TaskCreateRequest request) {
         Task task = taskService.create(request);
         return toResponse(task);
     }

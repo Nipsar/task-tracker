@@ -1,6 +1,6 @@
 package com.example.tasktracker.service;
 
-import com.example.tasktracker.api.HabitCreateRequest;
+import com.example.tasktracker.api.habit.HabitCreateRequest;
 import com.example.tasktracker.domain.exception.NotFoundException;
 import com.example.tasktracker.domain.model.Habit;
 import com.example.tasktracker.repository.HabitRepository;
