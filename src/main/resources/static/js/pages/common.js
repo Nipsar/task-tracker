@@ -11,7 +11,8 @@ export function initNavigation(activePage) {
         { page: "tasks", title: "Задачи", href: "/tasks.html" },
         { page: "projects", title: "Проекты", href: "/projects.html" },
         { page: "habits", title: "Привычки", href: "/habits.html" },
-        { page: "goals", title: "Цели", href: "/goals.html" }
+        { page: "goals", title: "Цели", href: "/goals.html" },
+        { page: "recipes", title: "Рецепты", href: "/recipes.html" }
     ];
 
     nav.innerHTML = items

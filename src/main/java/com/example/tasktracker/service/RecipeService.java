@@ -1,9 +1,5 @@
 package com.example.tasktracker.service;
 
-public class RecipeService {
-}
-package com.example.tasktracker.service;
-
 import com.example.tasktracker.api.recipe.RecipeCreateRequest;
 import com.example.tasktracker.api.recipe.RecipeIngredientRequest;
 import com.example.tasktracker.domain.exception.NotFoundException;
@@ -11,8 +7,8 @@ import com.example.tasktracker.domain.model.Ingredient;
 import com.example.tasktracker.domain.model.Recipe;
 import com.example.tasktracker.repository.IngredientRepository;
 import com.example.tasktracker.repository.RecipeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.util.List;

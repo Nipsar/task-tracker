@@ -51,3 +51,33 @@ export function normalizeHabits(habits) {
         createdAt: parseDate(habit.createdAt)
     }));
 }
+
+export function normalizeRecipes(recipes) {
+    return (recipes ?? []).map(recipe => ({
+        id: recipe.id,
+        title: String(recipe.title ?? "Без названия").trim(),
+        description: recipe.description ?? "",
+        imageUrl: recipe.imageUrl ?? "",
+        servings: Number(recipe.servings ?? 1),
+        caloriesPerServing: Number(recipe.caloriesPerServing ?? 0),
+        proteinPerServing: Number(recipe.proteinPerServing ?? 0),
+        fatPerServing: Number(recipe.fatPerServing ?? 0),
+        carbsPerServing: Number(recipe.carbsPerServing ?? 0),
+        ingredients: normalizeRecipeIngredients(recipe.ingredients ?? []),
+        createdAt: parseDate(recipe.createdAt),
+        updatedAt: parseDate(recipe.updatedAt)
+    }));
+}
+
+function normalizeRecipeIngredients(ingredients) {
+    return (ingredients ?? []).map(item => ({
+        id: item.id,
+        ingredient: {
+            id: item.ingredient?.id ?? null,
+            name: String(item.ingredient?.name ?? "Ингредиент").trim(),
+            defaultUnit: item.ingredient?.defaultUnit ?? item.unit ?? "GRAM"
+        },
+        amount: Number(item.amount ?? 0),
+        unit: item.unit ?? "GRAM"
+    }));
+}
