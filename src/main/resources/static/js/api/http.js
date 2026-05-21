@@ -82,6 +82,27 @@ export const api = {
         return requestJson(`/api/recipes/${recipeId}`, {
             method: "DELETE"
         });
+    },
+
+    getCurrentMealPlan() {
+      return requestJson("/api/meal-plans/current-week");
+    },
+
+    addMealPlanItem(payload) {
+      return requestJson("/api/meal-plans/current-week/items", {
+        method: "POST",
+        body: payload
+      });
+    },
+
+    deleteMealPlanItem(itemId) {
+      return requestJson(`/api/meal-plans/current-week/items/${itemId}`, {
+        method: "DELETE"
+      });
+    },
+
+    getCurrentMealPlanSummary() {
+      return requestJson("/api/meal-plans/current-week/summary");
     }
 };
 
@@ -98,3 +119,8 @@ export const completeHabit = (habitId) => api.completeHabit(habitId);
 export const getRecipes = () => api.getRecipes();
 export const createRecipe = (payload) => api.createRecipe(payload);
 export const deleteRecipe = (recipeId) => api.deleteRecipe(recipeId);
+
+export const getCurrentMealPlan = () => api.getCurrentMealPlan();
+export const addMealPlanItem = (payload) => api.addMealPlanItem(payload);
+export const deleteMealPlanItem = (itemId) => api.deleteMealPlanItem(itemId);
+export const getCurrentMealPlanSummary = () => api.getCurrentMealPlanSummary();

@@ -81,3 +81,42 @@ function normalizeRecipeIngredients(ingredients) {
         unit: item.unit ?? "GRAM"
     }));
 }
+
+export function normalizeMealPlan(mealPlan) {
+  return {
+    id: mealPlan?.id ?? null,
+    weekStartDate: mealPlan?.weekStartDate ?? null,
+    targetCalories: Number(mealPlan?.targetCalories ?? 0),
+    items: normalizeMealPlanItems(mealPlan?.items ?? [])
+  };
+}
+
+export function normalizeMealPlanItems(items) {
+  return (items ?? []).map(item => ({
+    id: item.id,
+    dayOfWeek: item.dayOfWeek,
+    mealType: item.mealType,
+    position: Number(item.position ?? 0),
+    recipe: {
+      id: item.recipe?.id ?? null,
+      title: String(item.recipe?.title ?? "Без названия").trim(),
+      description: item.recipe?.description ?? "",
+      imageUrl: item.recipe?.imageUrl ?? "",
+      servings: Number(item.recipe?.servings ?? 1),
+      caloriesPerServing: Number(item.recipe?.caloriesPerServing ?? 0),
+      proteinPerServing: Number(item.recipe?.proteinPerServing ?? 0),
+      fatPerServing: Number(item.recipe?.fatPerServing ?? 0),
+      carbsPerServing: Number(item.recipe?.carbsPerServing ?? 0)
+    }
+  }));
+}
+
+export function normalizeMealPlanSummary(summary) {
+  return {
+    targetCalories: Number(summary?.targetCalories ?? 0),
+    currentCalories: Number(summary?.currentCalories ?? 0),
+    protein: Number(summary?.protein ?? 0),
+    fat: Number(summary?.fat ?? 0),
+    carbs: Number(summary?.carbs ?? 0)
+  };
+}
