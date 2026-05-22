@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Task Tracker — Меню недели</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
@@ -17,14 +19,56 @@
         <span class="eyebrow">Meal Planner</span>
         <h1>Меню недели</h1>
         <p class="subtitle">
-          Блюда выбранные на неделю. Цель — видеть ккал, БЖУ, дефицит/перебор.
+          Блюда выбранные на неделю. Колонки Пн–Вс, внутри — завтрак, обед, ужин и перекусы.
         </p>
       </div>
 
       <div class="hero-actions">
+        <a class="secondary-btn" href="/recipes.html">Добавить блюда</a>
         <button id="reloadWeeklyMenuBtn" class="primary-btn" type="button">
           Обновить меню
         </button>
+      </div>
+    </section>
+
+    <section class="stats-grid nutrition-stats">
+      <article class="stat-card accent-green">
+        <span class="stat-label">Цель ккал</span>
+        <div id="targetCalories" class="stat-value">—</div>
+        <p class="stat-note">Недельная цель сейчас берётся из backend</p>
+      </article>
+
+      <article class="stat-card accent-orange">
+        <span class="stat-label">Сейчас ккал</span>
+        <div id="currentCalories" class="stat-value">—</div>
+        <p class="stat-note">Сумма блюд в меню</p>
+      </article>
+
+      <article class="stat-card accent-purple">
+        <span class="stat-label">Осталось</span>
+        <div id="leftCalories" class="stat-value">—</div>
+        <p class="stat-note">Цель минус текущее меню</p>
+      </article>
+
+      <article class="stat-card accent-blue">
+        <span class="stat-label">Блюд</span>
+        <div id="weeklyMealCount" class="stat-value">0</div>
+        <p class="stat-note">Всего позиций на неделе</p>
+      </article>
+    </section>
+
+    <section class="panel weekly-board-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Рацион по дням</h2>
+          <p>Семь колонок: понедельник — воскресенье.</p>
+        </div>
+      </div>
+
+      <p id="weeklyMenuStatus" class="form-message info">Загрузка меню...</p>
+
+      <div class="weekly-board-scroll">
+        <div id="weeklyMenuGrid" class="weekly-menu-grid"></div>
       </div>
     </section>
   </main>
