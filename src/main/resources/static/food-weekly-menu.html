@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Tracker — Меню недели</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<main class="page-shell">
+  <section class="hero-card">
+    <p class="eyebrow">Meal Planner</p>
+    <h1>Меню недели</h1>
+    <p>Блюда выбранные на неделю. Цель — видеть ккал, БЖУ, дефицит/перебор.</p>
+    <button id="reloadWeeklyMenuBtn" class="primary-button">Обновить меню</button>
+  </section>
+
+  <section class="stats-grid">
+    <article class="stat-card"><span>Цель ккал</span><strong id="targetCalories">—</strong></article>
+    <article class="stat-card"><span>Сейчас ккал</span><strong id="currentCalories">—</strong></article>
+    <article class="stat-card"><span>Осталось</span><strong id="leftCalories">—</strong></article>
+    <article class="stat-card"><span>Блюд</span><strong id="weeklyMealCount">0</strong></article>
+  </section>
+
+  <section class="content-card">
+    <div class="section-header">
+      <div>
+        <h2>Рацион</h2>
+        <p>Группировка по дням недели.</p>
+      </div>
+      <a href="/recipes.html" class="secondary-button">Добавить блюда</a>
+    </div>
+
+    <p id="weeklyMenuStatus" class="status-message">Загрузка меню...</p>
+    <div id="weeklyMenuGrid" class="weekly-menu-grid"></div>
+  </section>
+</main>
+
+<script type="module" src="/js/pages/food-weekly-menu-page.js"></script>
+</body>
+</html>
