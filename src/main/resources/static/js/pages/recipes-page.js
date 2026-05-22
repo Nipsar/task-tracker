@@ -1,12 +1,21 @@
 import { api } from "../api/http.js";
 
 import {
-  normalizeMealPlan,
-  normalizeMealPlanSummary,
-  normalizeRecipes
+    normalizeMealPlan,
+    normalizeMealPlanSummary,
+    normalizeRecipes
 } from "../api/normalizers.js";
 
-import { initNavigation } from "../layout/navigation.js";
+import { initNavigation } from "./common.js";
+
+import {
+    clearMessage,
+    escapeHtml,
+    renderEmptyState,
+    showMessage
+} from "../utils/dom.js";
+
+import { normalizeErrorMessage } from "../utils/errors.js";
 
 const elements = {
     loadButton: document.getElementById("loadRecipesBtn"),
@@ -44,6 +53,13 @@ const elements = {
     modalIngredients: document.getElementById("recipeModalIngredients"),
     toggleSelectedButton: document.getElementById("toggleSelectedRecipeBtn"),
     deleteRecipeButton: document.getElementById("deleteRecipeBtn")
+};
+
+const state = {
+    recipes: [],
+    mealPlan: null,
+    mealPlanSummary: null,
+    activeRecipe: null
 };
 
 initNavigation("recipes");
@@ -391,7 +407,7 @@ async function onCreateRecipeSubmit(event) {
         resetForm();
         showMessage(elements.formMessage, `Рецепт создан: ${createdRecipe.title}`, "success");
 
-        await isRecipeSelected(recipe.id)
+        await loadRecipes();
     } catch (error) {
         console.error(error);
         showMessage(elements.formMessage, normalizeErrorMessage(error), "error");

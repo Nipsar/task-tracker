@@ -13,8 +13,7 @@ export function initNavigation(activePage) {
         { page: "habits", title: "Привычки", href: "/habits.html" },
         { page: "goals", title: "Цели", href: "/goals.html" },
         { page: "recipes", title: "Рецепты", href: "/recipes.html" },
-        { id: "food-weekly-menu", label: "Меню недели", href: "/food-weekly-menu.html" }
-
+        { page: "food-weekly-menu", title: "Меню недели", href: "/food-weekly-menu.html" }
     ];
 
     nav.innerHTML = items

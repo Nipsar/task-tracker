@@ -67,6 +67,10 @@ export const api = {
         return requestJson(`/api/habits/${habitId}/complete`, { method: "POST" });
     },
 
+    getTodayBoard() {
+        return requestJson("/api/today-board");
+    },
+
     getRecipes() {
         return requestJson("/api/recipes");
     },
@@ -115,6 +119,7 @@ export const createGoal = (payload) => api.createGoal(payload);
 export const getHabits = () => api.getHabits();
 export const createHabit = (payload) => api.createHabit(payload);
 export const completeHabit = (habitId) => api.completeHabit(habitId);
+export const getTodayBoard = () => api.getTodayBoard();
 
 export const getRecipes = () => api.getRecipes();
 export const createRecipe = (payload) => api.createRecipe(payload);

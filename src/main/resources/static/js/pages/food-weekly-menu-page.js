@@ -1,5 +1,6 @@
 import { api } from "../api/http.js";
 import { normalizeMealPlan, normalizeMealPlanSummary } from "../api/normalizers.js";
+import { initNavigation } from "./common.js";
 
 const days = [
   ["MONDAY", "Понедельник"],
@@ -25,6 +26,8 @@ let state = {
   mealPlan: null,
   summary: null
 };
+
+initNavigation("food-weekly-menu");
 
 elements.reloadButton?.addEventListener("click", loadWeeklyMenu);
 document.addEventListener("DOMContentLoaded", loadWeeklyMenu);
