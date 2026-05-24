@@ -3,12 +3,8 @@ async function requestJson(path, options = {}) {
 
     const response = await fetch(path, {
         method,
-        headers: body === undefined
-            ? undefined
-            : { "Content-Type": "application/json" },
-        body: body === undefined
-            ? undefined
-            : JSON.stringify(body)
+        headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+        body: body === undefined ? undefined : JSON.stringify(body)
     });
 
     if (!response.ok) {
@@ -24,19 +20,12 @@ async function requestJson(path, options = {}) {
 }
 
 export const api = {
-    getTodayBoard() {
-        return requestJson("/api/today-board");
-    },
-
     getTasks() {
         return requestJson("/api/tasks");
     },
 
     createTask(payload) {
-        return requestJson("/api/tasks", {
-            method: "POST",
-            body: payload
-        });
+        return requestJson("/api/tasks", { method: "POST", body: payload });
     },
 
     updateTaskStatus(taskId, status) {
@@ -47,9 +36,7 @@ export const api = {
     },
 
     deleteTask(taskId) {
-        return requestJson(`/api/tasks/${taskId}`, {
-            method: "DELETE"
-        });
+        return requestJson(`/api/tasks/${taskId}`, { method: "DELETE" });
     },
 
     getProjects() {
@@ -57,10 +44,7 @@ export const api = {
     },
 
     createProject(payload) {
-        return requestJson("/api/projects", {
-            method: "POST",
-            body: payload
-        });
+        return requestJson("/api/projects", { method: "POST", body: payload });
     },
 
     getGoals() {
@@ -68,10 +52,7 @@ export const api = {
     },
 
     createGoal(payload) {
-        return requestJson("/api/goals", {
-            method: "POST",
-            body: payload
-        });
+        return requestJson("/api/goals", { method: "POST", body: payload });
     },
 
     getHabits() {
@@ -79,30 +60,41 @@ export const api = {
     },
 
     createHabit(payload) {
-        return requestJson("/api/habits", {
+        return requestJson("/api/habits", { method: "POST", body: payload });
+    },
+
+    completeHabit(habitId) {
+        return requestJson(`/api/habits/${habitId}/complete`, { method: "POST" });
+    },
+
+    getRecipes() {
+        return requestJson("/api/recipes");
+    },
+
+    createRecipe(payload) {
+        return requestJson("/api/recipes", {
             method: "POST",
             body: payload
         });
     },
 
-    completeHabit(habitId) {
-        return requestJson(`/api/habits/${habitId}/complete`, {
-            method: "POST"
+    deleteRecipe(recipeId) {
+        return requestJson(`/api/recipes/${recipeId}`, {
+            method: "DELETE"
         });
     }
 };
 
-export const getTodayBoard = () => api.getTodayBoard();
-
 export const getTasks = () => api.getTasks();
 export const createTask = (payload) => api.createTask(payload);
-
 export const getProjects = () => api.getProjects();
 export const createProject = (payload) => api.createProject(payload);
-
 export const getGoals = () => api.getGoals();
 export const createGoal = (payload) => api.createGoal(payload);
-
 export const getHabits = () => api.getHabits();
 export const createHabit = (payload) => api.createHabit(payload);
 export const completeHabit = (habitId) => api.completeHabit(habitId);
+
+export const getRecipes = () => api.getRecipes();
+export const createRecipe = (payload) => api.createRecipe(payload);
+export const deleteRecipe = (recipeId) => api.deleteRecipe(recipeId);
