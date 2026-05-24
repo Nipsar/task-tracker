@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface MealPlanItemRepository extends JpaRepository<MealPlanItem, UUID> {
     List<MealPlanItem> findAllByMealPlanOrderByDayOfWeekAscMealTypeAscPositionAsc(MealPlan mealPlan);
+
+    void deleteAllByMealPlan(MealPlan mealPlan);
 }

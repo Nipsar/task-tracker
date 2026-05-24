@@ -1,4 +1,5 @@
 package com.example.tasktracker.domain.model;
+import com.example.tasktracker.domain.exception.ValidationException;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -33,11 +34,33 @@ public class MealPlan {
 
     private MealPlan(LocalDate weekStartDate, Integer targetCalories) {
         this.weekStartDate = weekStartDate;
-        this.targetCalories = targetCalories;
+        this.targetCalories = validateTargetCalories(targetCalories);
     }
 
     public static MealPlan create(LocalDate weekStartDate, Integer targetCalories) {
-        return new MealPlan(weekStartDate, targetCalories);
+        return new MealPlan(weekStartDate, validateTargetCalories(targetCalories));
+    }
+
+    public void updateTargetCalories(Integer targetCalories) {
+        this.targetCalories = validateTargetCalories(targetCalories);
+    }
+
+    private static Integer validateTargetCalories(Integer value) {
+        if (value == null) {
+            throw new ValidationException(
+                    "meal_plan.target_calories.null",
+                    "target calories must not be null"
+            );
+        }
+
+        if (value <= 0) {
+            throw new ValidationException(
+                    "meal_plan.target_calories.not_positive",
+                    "target calories must be > 0"
+            );
+        }
+
+        return value;
     }
 
     @PrePersist

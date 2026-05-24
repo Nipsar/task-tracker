@@ -1,33 +1,43 @@
 import { api } from "../api/http.js";
 
 import {
-  normalizeMealPlan,
-  normalizeMealPlanSummary,
-  normalizeRecipes
+    normalizeMealPlan,
+    normalizeMealPlanSummary,
+    normalizeRecipes
 } from "../api/normalizers.js";
 
+import { initNavigation } from "./common.js";
+
 import {
-  clearMessage,
-  escapeHtml,
-  renderEmptyState,
-  showMessage
+    clearMessage,
+    escapeHtml,
+    renderEmptyState,
+    showMessage
 } from "../utils/dom.js";
 
 import { normalizeErrorMessage } from "../utils/errors.js";
-import { initNavigation } from "./common.js";
 
-const state = {
-    recipes: [],
-    mealPlan: null,
-    mealPlanSummary: null,
-    activeRecipe: null
+const dayTitles = {
+    MONDAY: "Пн",
+    TUESDAY: "Вт",
+    WEDNESDAY: "Ср",
+    THURSDAY: "Чт",
+    FRIDAY: "Пт",
+    SATURDAY: "Сб",
+    SUNDAY: "Вс"
+};
+
+const mealTypeTitles = {
+    BREAKFAST: "Завтрак",
+    LUNCH: "Обед",
+    DINNER: "Ужин",
+    SNACK: "Перекус"
 };
 
 const elements = {
     loadButton: document.getElementById("loadRecipesBtn"),
     statusMessage: document.getElementById("recipesStatusMessage"),
     recipeGrid: document.getElementById("recipeGrid"),
-    mealCardRail: document.getElementById("mealCardRail"),
 
     recipeCount: document.getElementById("recipeCount"),
     avgCalories: document.getElementById("avgCalories"),
@@ -57,12 +67,25 @@ const elements = {
     modalFat: document.getElementById("recipeModalFat"),
     modalCarbs: document.getElementById("recipeModalCarbs"),
     modalIngredients: document.getElementById("recipeModalIngredients"),
-    toggleSelectedButton: document.getElementById("toggleSelectedRecipeBtn"),
+
+    mealPlanDaySelect: document.getElementById("mealPlanDaySelect"),
+    mealPlanTypeSelect: document.getElementById("mealPlanTypeSelect"),
+    mealPlanPickerNote: document.getElementById("mealPlanPickerNote"),
+    addRecipeToWeekButton: document.getElementById("addRecipeToWeekBtn"),
+
     deleteRecipeButton: document.getElementById("deleteRecipeBtn")
+};
+
+const state = {
+    recipes: [],
+    mealPlan: null,
+    mealPlanSummary: null,
+    activeRecipe: null
 };
 
 initNavigation("recipes");
 bindEvents();
+
 document.addEventListener("DOMContentLoaded", loadRecipes);
 
 function bindEvents() {
@@ -74,8 +97,10 @@ function bindEvents() {
         element.addEventListener("click", closeModal);
     });
 
-    elements.toggleSelectedButton?.addEventListener("click", toggleActiveRecipeSelection);
+    elements.addRecipeToWeekButton?.addEventListener("click", addActiveRecipeToWeek);
     elements.deleteRecipeButton?.addEventListener("click", deleteActiveRecipe);
+    elements.mealPlanDaySelect?.addEventListener("change", updateMealPlanPickerNote);
+    elements.mealPlanTypeSelect?.addEventListener("change", updateMealPlanPickerNote);
 
     document.addEventListener("keydown", event => {
         if (event.key === "Escape") {
@@ -85,9 +110,9 @@ function bindEvents() {
 }
 
 async function loadRecipes() {
-    try {
-        elements.statusMessage.textContent = "Загружаю рецепты...";
+    setPageLoading(true);
 
+    try {
         state.recipes = normalizeRecipes(await api.getRecipes());
 
         try {
@@ -110,18 +135,19 @@ async function loadRecipes() {
             };
         }
 
-        elements.statusMessage.textContent = "";
+        clearMessage(elements.statusMessage);
         renderPage();
     } catch (error) {
         console.error(error);
-        elements.statusMessage.textContent = normalizeErrorMessage(error);
+        showMessage(elements.statusMessage, normalizeErrorMessage(error), "error");
+    } finally {
+        setPageLoading(false);
     }
 }
 
 function renderPage() {
     renderStats();
     renderRecipeGrid();
-    renderMealRail();
 }
 
 function renderStats() {
@@ -164,7 +190,7 @@ function renderRecipeGrid() {
 
     state.recipes.forEach(recipe => {
         const card = document.createElement("article");
-        card.className = "recipe-card";
+        card.className = `recipe-card ${isRecipeSelected(recipe.id) ? "selected" : ""}`;
         card.innerHTML = `
             <div class="recipe-card-image">
                 ${renderRecipeImage(recipe)}
@@ -205,50 +231,16 @@ function renderRecipeGrid() {
     });
 }
 
-function renderMealRail() {
-    if (!elements.mealCardRail) {
-        return;
-    }
-
-    if (state.recipes.length === 0) {
-        elements.mealCardRail.innerHTML = `
-            <div class="meal-rail-empty">
-                Добавь рецепты, и здесь появится нижнее меню блюд.
-            </div>
-        `;
-        return;
-    }
-
-    elements.mealCardRail.innerHTML = "";
-
-    state.recipes.forEach(recipe => {
-        const isSelected = isRecipeSelected(recipe.id);
-
-        const card = document.createElement("button");
-        card.className = `meal-choice-card ${isSelected ? "selected" : ""}`;
-        card.type = "button";
-        card.innerHTML = `
-            <span class="meal-choice-ring"></span>
-
-            <span class="meal-choice-image">
-                ${renderRecipeImage(recipe)}
-            </span>
-
-            <span class="meal-choice-content">
-                <strong>${escapeHtml(recipe.title)}</strong>
-                <small>${recipe.caloriesPerServing} ккал · Б${formatMacro(recipe.proteinPerServing)}</small>
-            </span>
-        `;
-
-        card.addEventListener("click", () => openRecipeWithAnimation(recipe, card));
-        elements.mealCardRail.appendChild(card);
-    });
+function isRecipeSelected(recipeId) {
+    return getSelectedRecipeIds().includes(recipeId);
 }
 
-function isRecipeSelected(recipeId) {
-  return Boolean(
-    state.mealPlan?.items?.some(item => item.recipe.id === recipeId)
-  );
+function getSelectedRecipeIds() {
+    const ids = state.mealPlan?.items
+        ?.map(item => item.recipe.id)
+        ?.filter(Boolean) ?? [];
+
+    return [...new Set(ids)];
 }
 
 function openRecipeWithAnimation(recipe, sourceElement) {
@@ -285,7 +277,7 @@ function openModal(recipe) {
         `)
         .join("");
 
-    updateModalSelectionButton();
+    updateMealPlanPickerNote();
 
     elements.modal.classList.remove("hidden");
     elements.modal.setAttribute("aria-hidden", "false");
@@ -299,44 +291,77 @@ function closeModal() {
     elements.modal?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
 }
+async function addActiveRecipeToWeek() {
+    const recipe = state.activeRecipe;
 
-async function toggleActiveRecipeSelection() {
-  const recipe = state.activeRecipe;
-
-  if (!recipe) {
-    return;
-  }
-
-  elements.toggleSelectedButton.disabled = true;
-  elements.toggleSelectedButton.textContent = "Сохраняю...";
-
-  try {
-    const existingItem = state.mealPlan?.items?.find(
-      item => item.recipe.id === recipe.id
-    );
-
-    if (existingItem) {
-      await api.deleteMealPlanItem(existingItem.id);
-    } else {
-      await api.addMealPlanItem({
-        recipeId: recipe.id,
-        dayOfWeek: "MONDAY",
-        mealType: "LUNCH"
-      });
+    if (!recipe) {
+        return;
     }
 
-    state.mealPlan = normalizeMealPlan(await api.getCurrentMealPlan());
-    state.mealPlanSummary = normalizeMealPlanSummary(await api.getCurrentMealPlanSummary());
+    const dayOfWeek = elements.mealPlanDaySelect?.value || "MONDAY";
+    const mealType = elements.mealPlanTypeSelect?.value || "LUNCH";
 
-    updateModalSelectionButton();
-    renderPage();
-  } catch (error) {
-    console.error(error);
-    elements.statusMessage.textContent = normalizeErrorMessage(error);
-  } finally {
-    elements.toggleSelectedButton.disabled = false;
-    updateModalSelectionButton();
-  }
+    const existingSameSlot = state.mealPlan?.items?.find(item =>
+        item.recipe.id === recipe.id &&
+        item.dayOfWeek === dayOfWeek &&
+        item.mealType === mealType
+    );
+
+    if (existingSameSlot) {
+        showMessage(
+            elements.statusMessage,
+            `Уже есть в меню: ${dayTitles[dayOfWeek]}, ${mealTypeTitles[mealType]}.`,
+            "info"
+        );
+        updateMealPlanPickerNote();
+        return;
+    }
+
+    elements.addRecipeToWeekButton.disabled = true;
+    elements.addRecipeToWeekButton.textContent = "Добавляю...";
+
+    try {
+        await api.addMealPlanItem({
+            recipeId: recipe.id,
+            dayOfWeek,
+            mealType
+        });
+
+        state.mealPlan = normalizeMealPlan(await api.getCurrentMealPlan());
+        state.mealPlanSummary = normalizeMealPlanSummary(await api.getCurrentMealPlanSummary());
+
+        renderPage();
+        updateMealPlanPickerNote();
+
+        showMessage(
+            elements.statusMessage,
+            `Добавлено в меню: ${dayTitles[dayOfWeek]}, ${mealTypeTitles[mealType]}.`,
+            "success"
+        );
+    } catch (error) {
+        console.error(error);
+        showMessage(elements.statusMessage, normalizeErrorMessage(error), "error");
+    } finally {
+        elements.addRecipeToWeekButton.disabled = false;
+        elements.addRecipeToWeekButton.textContent = "Добавить в меню недели";
+    }
+}
+
+function updateMealPlanPickerNote() {
+    const recipe = state.activeRecipe;
+
+    if (!recipe || !elements.mealPlanPickerNote) {
+        return;
+    }
+
+    const placements = state.mealPlan?.items
+        ?.filter(item => item.recipe.id === recipe.id)
+        ?.map(item => `${dayTitles[item.dayOfWeek] ?? item.dayOfWeek} · ${mealTypeTitles[item.mealType] ?? item.mealType}`)
+        ?? [];
+
+    elements.mealPlanPickerNote.textContent = placements.length === 0
+        ? "Этого блюда ещё нет в меню недели."
+        : `Уже в меню: ${placements.join(", ")}.`;
 }
 
 async function deleteActiveRecipe() {
@@ -354,36 +379,24 @@ async function deleteActiveRecipe() {
         await api.deleteRecipe(recipe.id);
 
         if (state.mealPlan) {
-          state.mealPlan.items = state.mealPlan.items.filter(
-            item => item.recipe.id !== recipe.id
-          );
+            state.mealPlan.items = state.mealPlan.items.filter(
+                item => item.recipe.id !== recipe.id
+            );
         }
+
         state.recipes = state.recipes.filter(item => item.id !== recipe.id);
 
         closeModal();
         renderPage();
 
-        elements.statusMessage.textContent = "Рецепт удалён.";
+        showMessage(elements.statusMessage, "Рецепт удалён.", "success");
     } catch (error) {
         console.error(error);
-        elements.statusMessage.textContent = normalizeErrorMessage(error);
+        showMessage(elements.statusMessage, normalizeErrorMessage(error), "error");
     } finally {
         elements.deleteRecipeButton.disabled = false;
         elements.deleteRecipeButton.textContent = previousText;
     }
-}
-
-function updateModalSelectionButton() {
-    const recipe = state.activeRecipe;
-
-    if (!recipe) {
-        return;
-    }
-
-    const isSelected = isRecipeSelected(recipe.id);
-    elements.toggleSelectedButton.textContent = isSelected
-      ? "Убрать из недели"
-      : "Выбрать на неделю";
 }
 
 async function onCreateRecipeSubmit(event) {
@@ -466,14 +479,19 @@ function parseIngredients(rawValue) {
             }
 
             const [ingredientName, amountRaw, unitRaw] = parts;
+            const amount = Number(amountRaw.replace(",", "."));
+
+            if (!ingredientName || !Number.isFinite(amount) || amount <= 0 || !unitRaw) {
+                return null;
+            }
 
             return {
                 ingredientName,
-                amount: Number(amountRaw.replace(",", ".")),
+                amount,
                 unit: unitRaw.toUpperCase()
             };
         })
-        .filter(item => item && item.ingredientName && item.amount > 0 && item.unit);
+        .filter(Boolean);
 }
 
 function resetForm() {
@@ -497,7 +515,7 @@ function setPageLoading(isLoading) {
     elements.loadButton.textContent = isLoading ? "Загрузка..." : "Обновить рецепты";
 
     if (isLoading && elements.statusMessage) {
-        elements.statusMessage.textContent = "Загружаю рецепты...";
+        showMessage(elements.statusMessage, "Загружаю рецепты...", "info");
     }
 }
 

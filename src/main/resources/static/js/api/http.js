@@ -67,6 +67,10 @@ export const api = {
         return requestJson(`/api/habits/${habitId}/complete`, { method: "POST" });
     },
 
+    getTodayBoard() {
+        return requestJson("/api/today-board");
+    },
+
     getRecipes() {
         return requestJson("/api/recipes");
     },
@@ -103,6 +107,20 @@ export const api = {
 
     getCurrentMealPlanSummary() {
       return requestJson("/api/meal-plans/current-week/summary");
+    },
+
+    updateCurrentMealPlanTargetCalories(targetCalories) {
+      return requestJson("/api/meal-plans/current-week/target-calories", {
+        method: "PATCH",
+        body: { targetCalories }
+      });
+    },
+
+    autoDistributeCurrentMealPlan(recipeIds = []) {
+      return requestJson("/api/meal-plans/current-week/auto-distribute", {
+        method: "POST",
+        body: { recipeIds }
+      });
     }
 };
 
@@ -115,6 +133,7 @@ export const createGoal = (payload) => api.createGoal(payload);
 export const getHabits = () => api.getHabits();
 export const createHabit = (payload) => api.createHabit(payload);
 export const completeHabit = (habitId) => api.completeHabit(habitId);
+export const getTodayBoard = () => api.getTodayBoard();
 
 export const getRecipes = () => api.getRecipes();
 export const createRecipe = (payload) => api.createRecipe(payload);
@@ -124,3 +143,9 @@ export const getCurrentMealPlan = () => api.getCurrentMealPlan();
 export const addMealPlanItem = (payload) => api.addMealPlanItem(payload);
 export const deleteMealPlanItem = (itemId) => api.deleteMealPlanItem(itemId);
 export const getCurrentMealPlanSummary = () => api.getCurrentMealPlanSummary();
+
+export const updateCurrentMealPlanTargetCalories = (targetCalories) =>
+  api.updateCurrentMealPlanTargetCalories(targetCalories);
+
+export const autoDistributeCurrentMealPlan = (recipeIds = []) =>
+  api.autoDistributeCurrentMealPlan(recipeIds);

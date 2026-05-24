@@ -23,17 +23,31 @@ public class MealPlanController {
     @GetMapping("/api/meal-plans/current-week")
     public MealPlanResponse getCurrentWeek() {
         MealPlan mealPlan = mealPlanService.getOrCreateCurrentWeek();
-        List<MealPlanItemResponse> items = mealPlanService.getCurrentWeekItems()
-                .stream()
-                .map(this::toItemResponse)
-                .toList();
+        List<MealPlanItem> items = mealPlanService.getCurrentWeekItems();
 
-        return new MealPlanResponse(
-                mealPlan.getId(),
-                mealPlan.getWeekStartDate(),
-                mealPlan.getTargetCalories(),
-                items
-        );
+        return toMealPlanResponse(mealPlan, items);
+    }
+
+    @PatchMapping("/api/meal-plans/current-week/target-calories")
+    public MealPlanResponse updateTargetCalories(
+            @Valid @RequestBody MealPlanTargetCaloriesRequest request
+    ) {
+        MealPlan mealPlan = mealPlanService.updateCurrentWeekTargetCalories(request.targetCalories());
+        List<MealPlanItem> items = mealPlanService.getCurrentWeekItems();
+
+        return toMealPlanResponse(mealPlan, items);
+    }
+
+    @PostMapping("/api/meal-plans/current-week/auto-distribute")
+    public MealPlanResponse autoDistribute(
+            @Valid @RequestBody(required = false) MealPlanAutoDistributeRequest request
+    ) {
+        List<UUID> recipeIds = request == null ? List.of() : request.recipeIds();
+
+        List<MealPlanItem> items = mealPlanService.autoDistributeCurrentWeek(recipeIds);
+        MealPlan mealPlan = mealPlanService.getOrCreateCurrentWeek();
+
+        return toMealPlanResponse(mealPlan, items);
     }
 
     @PostMapping("/api/meal-plans/current-week/items")
@@ -51,6 +65,17 @@ public class MealPlanController {
     @GetMapping("/api/meal-plans/current-week/summary")
     public MealPlanSummaryResponse getSummary() {
         return mealPlanService.getCurrentWeekSummary();
+    }
+
+    private MealPlanResponse toMealPlanResponse(MealPlan mealPlan, List<MealPlanItem> items) {
+        return new MealPlanResponse(
+                mealPlan.getId(),
+                mealPlan.getWeekStartDate(),
+                mealPlan.getTargetCalories(),
+                items.stream()
+                        .map(this::toItemResponse)
+                        .toList()
+        );
     }
 
     private MealPlanItemResponse toItemResponse(MealPlanItem item) {
