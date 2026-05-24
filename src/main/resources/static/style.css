@@ -1916,3 +1916,56 @@ h1 {
         min-width: 1470px;
     }
 }
+
+.target-calories-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.target-calories-form label {
+    font-size: 12px;
+    color: var(--muted-text, #94a3b8);
+    white-space: nowrap;
+}
+
+.target-calories-form input {
+    width: 110px;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.8);
+    color: inherit;
+}
+
+.weekly-day-target {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.weekly-day-target span {
+    font-weight: 800;
+}
+
+.weekly-day-target small {
+    font-size: 11px;
+    opacity: 0.75;
+}
+
+.weekly-day-target.is-good {
+    color: #22c55e;
+}
+
+.weekly-day-target.is-under {
+    color: #f59e0b;
+}
+
+.weekly-day-target.is-over {
+    color: #ef4444;
+}

@@ -107,6 +107,20 @@ export const api = {
 
     getCurrentMealPlanSummary() {
       return requestJson("/api/meal-plans/current-week/summary");
+    },
+
+    updateCurrentMealPlanTargetCalories(targetCalories) {
+      return requestJson("/api/meal-plans/current-week/target-calories", {
+        method: "PATCH",
+        body: { targetCalories }
+      });
+    },
+
+    autoDistributeCurrentMealPlan(recipeIds = []) {
+      return requestJson("/api/meal-plans/current-week/auto-distribute", {
+        method: "POST",
+        body: { recipeIds }
+      });
     }
 };
 
@@ -129,3 +143,9 @@ export const getCurrentMealPlan = () => api.getCurrentMealPlan();
 export const addMealPlanItem = (payload) => api.addMealPlanItem(payload);
 export const deleteMealPlanItem = (itemId) => api.deleteMealPlanItem(itemId);
 export const getCurrentMealPlanSummary = () => api.getCurrentMealPlanSummary();
+
+export const updateCurrentMealPlanTargetCalories = (targetCalories) =>
+  api.updateCurrentMealPlanTargetCalories(targetCalories);
+
+export const autoDistributeCurrentMealPlan = (recipeIds = []) =>
+  api.autoDistributeCurrentMealPlan(recipeIds);

@@ -25,29 +25,47 @@
 
       <div class="hero-actions">
         <a class="secondary-btn" href="/recipes.html">Добавить блюда</a>
-        <button id="reloadWeeklyMenuBtn" class="primary-btn" type="button">
+
+        <form id="targetCaloriesForm" class="target-calories-form">
+          <label for="targetCaloriesInput">Норма ккал/день</label>
+          <input
+                  id="targetCaloriesInput"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="2200"
+          />
+          <button id="saveTargetCaloriesBtn" class="secondary-btn" type="submit">
+            Сохранить
+          </button>
+        </form>
+
+        <button id="autoDistributeMenuBtn" class="primary-btn" type="button">
+          Распределить автоматически
+        </button>
+
+        <button id="reloadWeeklyMenuBtn" class="secondary-btn" type="button">
           Обновить меню
         </button>
       </div>
-    </section>
 
     <section class="stats-grid nutrition-stats">
       <article class="stat-card accent-green">
         <span class="stat-label">Цель ккал</span>
         <div id="targetCalories" class="stat-value">—</div>
-        <p class="stat-note">Недельная цель сейчас берётся из backend</p>
+        <p class="stat-note">Дневная цель рациона</p>
       </article>
 
       <article class="stat-card accent-orange">
         <span class="stat-label">Сейчас ккал</span>
         <div id="currentCalories" class="stat-value">—</div>
-        <p class="stat-note">Сумма блюд в меню</p>
+        <p class="stat-note">Среднее ккал/день</p>
       </article>
 
       <article class="stat-card accent-purple">
         <span class="stat-label">Осталось</span>
         <div id="leftCalories" class="stat-value">—</div>
-        <p class="stat-note">Цель минус текущее меню</p>
+        <p class="stat-note">Цель минус среднее за день</p>
       </article>
 
       <article class="stat-card accent-blue">
