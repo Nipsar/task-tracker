@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 
 @Service
 public class MealPlanService {
@@ -171,19 +174,20 @@ public class MealPlanService {
                 ? List.of()
                 : recipeIds.stream()
                 .filter(Objects::nonNull)
+                .distinct()
                 .toList();
 
         if (!selectedIds.isEmpty()) {
-            return selectedIds.stream()
+            return distinctRecipes(selectedIds.stream()
                     .map(this::getRecipeOrThrow)
-                    .toList();
+                    .toList());
         }
 
-        return mealPlanItemRepository
+        return distinctRecipes(mealPlanItemRepository
                 .findAllByMealPlanOrderByDayOfWeekAscMealTypeAscPositionAsc(mealPlan)
                 .stream()
                 .map(MealPlanItem::getRecipe)
-                .toList();
+                .toList());
     }
 
     private Recipe getRecipeOrThrow(UUID recipeId) {
@@ -195,46 +199,38 @@ public class MealPlanService {
     }
 
     private List<MealPlanItem> distributeRecipes(MealPlan mealPlan, List<Recipe> recipes) {
-        List<DayBucket> buckets = WEEK_DAYS.stream()
-                .map(DayBucket::new)
+        List<Recipe> validRecipes = distinctRecipes(recipes).stream()
+                .filter(recipe -> safeCalories(recipe) > 0)
                 .toList();
 
-        List<Recipe> sortedRecipes = new ArrayList<>(recipes);
-        sortedRecipes.sort(
-                Comparator.comparingInt(this::safeCalories)
-                        .reversed()
-                        .thenComparing(Recipe::getTitle, String.CASE_INSENSITIVE_ORDER)
-        );
-
-        for (Recipe recipe : sortedRecipes) {
-            DayBucket bucket = buckets.stream()
-                    .min(
-                            Comparator
-                                    .comparingInt((DayBucket candidate) ->
-                                            distributionScore(candidate, recipe, mealPlan.getTargetCalories())
-                                    )
-                                    .thenComparingInt(DayBucket::getCalories)
-                                    .thenComparing(DayBucket::getDayOfWeek)
-                    )
-                    .orElseThrow();
-
-            bucket.add(recipe);
+        if (validRecipes.isEmpty()) {
+            throw new ValidationException(
+                    "meal_plan.auto_distribution.no_calories",
+                    "selected recipes must have calories > 0"
+            );
         }
 
         List<MealPlanItem> result = new ArrayList<>();
 
-        for (DayBucket bucket : buckets) {
+        for (int dayIndex = 0; dayIndex < WEEK_DAYS.size(); dayIndex++) {
+            DayOfWeek dayOfWeek = WEEK_DAYS.get(dayIndex);
+            List<Recipe> dailyRecipes = buildDailyRecipes(
+                    validRecipes,
+                    mealPlan.getTargetCalories(),
+                    dayIndex
+            );
+
             Map<MealType, Integer> positionsByMealType = new EnumMap<>(MealType.class);
 
-            for (int index = 0; index < bucket.getRecipes().size(); index++) {
-                Recipe recipe = bucket.getRecipes().get(index);
+            for (int index = 0; index < dailyRecipes.size(); index++) {
+                Recipe recipe = dailyRecipes.get(index);
                 MealType mealType = mealTypeForIndex(index);
                 int position = positionsByMealType.merge(mealType, 1, Integer::sum);
 
                 result.add(MealPlanItem.create(
                         mealPlan,
                         recipe,
-                        bucket.getDayOfWeek(),
+                        dayOfWeek,
                         mealType,
                         position
                 ));
@@ -294,5 +290,98 @@ public class MealPlanService {
         private int getCalories() {
             return calories;
         }
+    }
+
+    private List<Recipe> buildDailyRecipes(List<Recipe> recipes, int targetCalories, int dayOffset) {
+        List<Recipe> rotatedRecipes = rotateRecipes(recipes, dayOffset);
+
+        int maxRecipeCalories = rotatedRecipes.stream()
+                .mapToInt(this::safeCalories)
+                .max()
+                .orElseThrow();
+
+        int limit = targetCalories + maxRecipeCalories;
+
+        int[] previousSum = new int[limit + 1];
+        int[] previousRecipeIndex = new int[limit + 1];
+
+        Arrays.fill(previousSum, -1);
+        Arrays.fill(previousRecipeIndex, -1);
+
+        previousSum[0] = 0;
+
+        for (int sum = 0; sum <= limit; sum++) {
+            if (previousSum[sum] == -1) {
+                continue;
+            }
+
+            for (int recipeIndex = 0; recipeIndex < rotatedRecipes.size(); recipeIndex++) {
+                int nextSum = sum + safeCalories(rotatedRecipes.get(recipeIndex));
+
+                if (nextSum <= limit && previousSum[nextSum] == -1) {
+                    previousSum[nextSum] = sum;
+                    previousRecipeIndex[nextSum] = recipeIndex;
+                }
+            }
+        }
+
+        int bestSum = -1;
+
+        for (int sum = targetCalories; sum <= limit; sum++) {
+            if (previousSum[sum] != -1) {
+                bestSum = sum;
+                break;
+            }
+        }
+
+        if (bestSum == -1) {
+            throw new ValidationException(
+                    "meal_plan.auto_distribution.unreachable",
+                    "cannot build day menu with selected recipes"
+            );
+        }
+
+        List<Recipe> result = new ArrayList<>();
+        int currentSum = bestSum;
+
+        while (currentSum > 0) {
+            int recipeIndex = previousRecipeIndex[currentSum];
+
+            if (recipeIndex < 0) {
+                break;
+            }
+
+            result.add(rotatedRecipes.get(recipeIndex));
+            currentSum = previousSum[currentSum];
+        }
+
+        Collections.reverse(result);
+        return result;
+    }
+
+    private List<Recipe> rotateRecipes(List<Recipe> recipes, int offset) {
+        if (recipes.isEmpty()) {
+            return recipes;
+        }
+
+        int normalizedOffset = offset % recipes.size();
+
+        List<Recipe> result = new ArrayList<>();
+        result.addAll(recipes.subList(normalizedOffset, recipes.size()));
+        result.addAll(recipes.subList(0, normalizedOffset));
+
+        return result;
+    }
+
+    private List<Recipe> distinctRecipes(List<Recipe> recipes) {
+        Map<UUID, Recipe> byId = new LinkedHashMap<>();
+
+        for (Recipe recipe : recipes) {
+            if (recipe != null && recipe.getId() != null) {
+                byId.putIfAbsent(recipe.getId(), recipe);
+            }
+        }
+
+        return new ArrayList<>(byId.values());
     }
 }
