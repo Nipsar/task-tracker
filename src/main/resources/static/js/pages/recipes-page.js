@@ -1,12 +1,25 @@
 import { api } from "../api/http.js";
-import { normalizeRecipes } from "../api/normalizers.js";
-import { clearMessage, escapeHtml, renderEmptyState, showMessage } from "../utils/dom.js";
+
+import {
+  normalizeMealPlan,
+  normalizeMealPlanSummary,
+  normalizeRecipes
+} from "../api/normalizers.js";
+
+import {
+  clearMessage,
+  escapeHtml,
+  renderEmptyState,
+  showMessage
+} from "../utils/dom.js";
+
 import { normalizeErrorMessage } from "../utils/errors.js";
 import { initNavigation } from "./common.js";
 
 const state = {
     recipes: [],
-    selectedRecipeIds: new Set(),
+    mealPlan: null,
+    mealPlanSummary: null,
     activeRecipe: null
 };
 
@@ -72,22 +85,36 @@ function bindEvents() {
 }
 
 async function loadRecipes() {
-    setPageLoading(true);
-
     try {
-        state.recipes = normalizeRecipes(await api.getRecipes());
-        renderPage();
+        elements.statusMessage.textContent = "Загружаю рецепты...";
 
-        elements.statusMessage.textContent = state.recipes.length === 0
-            ? "Рецептов пока нет. Добавь первое блюдо через форму выше."
-            : `Загружено рецептов: ${state.recipes.length}.`;
+        state.recipes = normalizeRecipes(await api.getRecipes());
+
+        try {
+            state.mealPlan = normalizeMealPlan(await api.getCurrentMealPlan());
+            state.mealPlanSummary = normalizeMealPlanSummary(await api.getCurrentMealPlanSummary());
+        } catch (mealPlanError) {
+            console.error("Meal plan load failed", mealPlanError);
+            state.mealPlan = {
+                id: null,
+                weekStartDate: null,
+                targetCalories: 0,
+                items: []
+            };
+            state.mealPlanSummary = {
+                targetCalories: 0,
+                currentCalories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0
+            };
+        }
+
+        elements.statusMessage.textContent = "";
+        renderPage();
     } catch (error) {
         console.error(error);
-        state.recipes = [];
-        renderPage();
         elements.statusMessage.textContent = normalizeErrorMessage(error);
-    } finally {
-        setPageLoading(false);
     }
 }
 
@@ -117,7 +144,7 @@ function renderStats() {
     });
 
     elements.ingredientCount.textContent = uniqueIngredients.size;
-    elements.selectedCount.textContent = state.selectedRecipeIds.size;
+    elements.selectedCount.textContent = state.mealPlan?.items?.length ?? 0;
 }
 
 function renderRecipeGrid() {
@@ -195,7 +222,7 @@ function renderMealRail() {
     elements.mealCardRail.innerHTML = "";
 
     state.recipes.forEach(recipe => {
-        const isSelected = state.selectedRecipeIds.has(recipe.id);
+        const isSelected = isRecipeSelected(recipe.id);
 
         const card = document.createElement("button");
         card.className = `meal-choice-card ${isSelected ? "selected" : ""}`;
@@ -216,6 +243,12 @@ function renderMealRail() {
         card.addEventListener("click", () => openRecipeWithAnimation(recipe, card));
         elements.mealCardRail.appendChild(card);
     });
+}
+
+function isRecipeSelected(recipeId) {
+  return Boolean(
+    state.mealPlan?.items?.some(item => item.recipe.id === recipeId)
+  );
 }
 
 function openRecipeWithAnimation(recipe, sourceElement) {
@@ -267,21 +300,43 @@ function closeModal() {
     document.body.classList.remove("modal-open");
 }
 
-function toggleActiveRecipeSelection() {
-    const recipe = state.activeRecipe;
+async function toggleActiveRecipeSelection() {
+  const recipe = state.activeRecipe;
 
-    if (!recipe) {
-        return;
-    }
+  if (!recipe) {
+    return;
+  }
 
-    if (state.selectedRecipeIds.has(recipe.id)) {
-        state.selectedRecipeIds.delete(recipe.id);
+  elements.toggleSelectedButton.disabled = true;
+  elements.toggleSelectedButton.textContent = "Сохраняю...";
+
+  try {
+    const existingItem = state.mealPlan?.items?.find(
+      item => item.recipe.id === recipe.id
+    );
+
+    if (existingItem) {
+      await api.deleteMealPlanItem(existingItem.id);
     } else {
-        state.selectedRecipeIds.add(recipe.id);
+      await api.addMealPlanItem({
+        recipeId: recipe.id,
+        dayOfWeek: "MONDAY",
+        mealType: "LUNCH"
+      });
     }
+
+    state.mealPlan = normalizeMealPlan(await api.getCurrentMealPlan());
+    state.mealPlanSummary = normalizeMealPlanSummary(await api.getCurrentMealPlanSummary());
 
     updateModalSelectionButton();
     renderPage();
+  } catch (error) {
+    console.error(error);
+    elements.statusMessage.textContent = normalizeErrorMessage(error);
+  } finally {
+    elements.toggleSelectedButton.disabled = false;
+    updateModalSelectionButton();
+  }
 }
 
 async function deleteActiveRecipe() {
@@ -298,7 +353,11 @@ async function deleteActiveRecipe() {
     try {
         await api.deleteRecipe(recipe.id);
 
-        state.selectedRecipeIds.delete(recipe.id);
+        if (state.mealPlan) {
+          state.mealPlan.items = state.mealPlan.items.filter(
+            item => item.recipe.id !== recipe.id
+          );
+        }
         state.recipes = state.recipes.filter(item => item.id !== recipe.id);
 
         closeModal();
@@ -321,11 +380,10 @@ function updateModalSelectionButton() {
         return;
     }
 
-    const isSelected = state.selectedRecipeIds.has(recipe.id);
-
+    const isSelected = isRecipeSelected(recipe.id);
     elements.toggleSelectedButton.textContent = isSelected
-        ? "Убрать из недели"
-        : "Выбрать на неделю";
+      ? "Убрать из недели"
+      : "Выбрать на неделю";
 }
 
 async function onCreateRecipeSubmit(event) {
