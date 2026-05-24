@@ -99,6 +99,8 @@ function bindEvents() {
 
     elements.addRecipeToWeekButton?.addEventListener("click", addActiveRecipeToWeek);
     elements.deleteRecipeButton?.addEventListener("click", deleteActiveRecipe);
+    elements.mealPlanDaySelect?.addEventListener("change", updateMealPlanPickerNote);
+    elements.mealPlanTypeSelect?.addEventListener("change", updateMealPlanPickerNote);
 
     document.addEventListener("keydown", event => {
         if (event.key === "Escape") {
@@ -168,7 +170,7 @@ function renderStats() {
     });
 
     elements.ingredientCount.textContent = uniqueIngredients.size;
-    elements.selectedCount.textContent = getSelectedRecipeIds().length;
+    elements.selectedCount.textContent = state.mealPlan?.items?.length ?? 0;
 }
 
 function renderRecipeGrid() {
@@ -289,7 +291,6 @@ function closeModal() {
     elements.modal?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
 }
-
 async function addActiveRecipeToWeek() {
     const recipe = state.activeRecipe;
 
@@ -297,37 +298,44 @@ async function addActiveRecipeToWeek() {
         return;
     }
 
-    const selectedRecipeIds = getSelectedRecipeIds();
+    const dayOfWeek = elements.mealPlanDaySelect?.value || "MONDAY";
+    const mealType = elements.mealPlanTypeSelect?.value || "LUNCH";
 
-    if (selectedRecipeIds.includes(recipe.id)) {
+    const existingSameSlot = state.mealPlan?.items?.find(item =>
+        item.recipe.id === recipe.id &&
+        item.dayOfWeek === dayOfWeek &&
+        item.mealType === mealType
+    );
+
+    if (existingSameSlot) {
         showMessage(
             elements.statusMessage,
-            "Это блюдо уже выбрано для меню недели.",
+            `Уже есть в меню: ${dayTitles[dayOfWeek]}, ${mealTypeTitles[mealType]}.`,
             "info"
         );
         updateMealPlanPickerNote();
         return;
     }
 
-    const nextRecipeIds = [...selectedRecipeIds, recipe.id];
-
     elements.addRecipeToWeekButton.disabled = true;
-    elements.addRecipeToWeekButton.textContent = "Распределяю...";
+    elements.addRecipeToWeekButton.textContent = "Добавляю...";
 
     try {
-        state.mealPlan = normalizeMealPlan(
-            await api.autoDistributeCurrentMealPlan(nextRecipeIds)
-        );
-        state.mealPlanSummary = normalizeMealPlanSummary(
-            await api.getCurrentMealPlanSummary()
-        );
+        await api.addMealPlanItem({
+            recipeId: recipe.id,
+            dayOfWeek,
+            mealType
+        });
+
+        state.mealPlan = normalizeMealPlan(await api.getCurrentMealPlan());
+        state.mealPlanSummary = normalizeMealPlanSummary(await api.getCurrentMealPlanSummary());
 
         renderPage();
         updateMealPlanPickerNote();
 
         showMessage(
             elements.statusMessage,
-            "Блюдо добавлено. Меню недели пересчитано автоматически.",
+            `Добавлено в меню: ${dayTitles[dayOfWeek]}, ${mealTypeTitles[mealType]}.`,
             "success"
         );
     } catch (error) {
@@ -346,11 +354,14 @@ function updateMealPlanPickerNote() {
         return;
     }
 
-    const selectedRecipeIds = getSelectedRecipeIds();
+    const placements = state.mealPlan?.items
+        ?.filter(item => item.recipe.id === recipe.id)
+        ?.map(item => `${dayTitles[item.dayOfWeek] ?? item.dayOfWeek} · ${mealTypeTitles[item.mealType] ?? item.mealType}`)
+        ?? [];
 
-    elements.mealPlanPickerNote.textContent = selectedRecipeIds.includes(recipe.id)
-        ? "Это блюдо уже участвует в автоматическом меню недели."
-        : "Нажми кнопку — блюдо добавится в пул питания, а неделя пересчитается сама.";
+    elements.mealPlanPickerNote.textContent = placements.length === 0
+        ? "Этого блюда ещё нет в меню недели."
+        : `Уже в меню: ${placements.join(", ")}.`;
 }
 
 async function deleteActiveRecipe() {

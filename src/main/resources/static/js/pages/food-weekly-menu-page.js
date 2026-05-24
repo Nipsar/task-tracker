@@ -50,7 +50,7 @@ initNavigation("food-weekly-menu");
 elements.reloadButton?.addEventListener("click", loadWeeklyMenu);
 elements.grid?.addEventListener("click", onWeeklyGridClick);
 elements.targetCaloriesForm?.addEventListener("submit", onTargetCaloriesSubmit);
-elements.autoDistributeButton?.addEventListener("click", onAutoDistributeClick);
+// elements.autoDistributeButton?.addEventListener("click", onAutoDistributeClick);
 
 document.addEventListener("DOMContentLoaded", loadWeeklyMenu);
 
