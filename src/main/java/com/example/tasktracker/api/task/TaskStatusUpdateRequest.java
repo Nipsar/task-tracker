@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.task;
 
 import com.example.tasktracker.domain.model.TaskStatus;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.habit;
 
 import com.example.tasktracker.domain.model.Habit;
 import com.example.tasktracker.service.HabitService;

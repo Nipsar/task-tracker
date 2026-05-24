@@ -1,7 +1,6 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.task;
 
 import com.example.tasktracker.domain.model.TaskStatus;
-import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.example.tasktracker.service;
 
-import com.example.tasktracker.api.ProjectCreateRequest;
+import com.example.tasktracker.api.project.ProjectCreateRequest;
 import com.example.tasktracker.domain.exception.NotFoundException;
 import com.example.tasktracker.domain.model.Project;
 import com.example.tasktracker.repository.ProjectRepository;

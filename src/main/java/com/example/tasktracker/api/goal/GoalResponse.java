@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.goal;
 
 import java.time.Instant;
 import java.util.UUID;

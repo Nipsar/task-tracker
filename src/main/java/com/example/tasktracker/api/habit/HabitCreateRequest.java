@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.habit;
 
 import jakarta.validation.constraints.NotBlank;
 

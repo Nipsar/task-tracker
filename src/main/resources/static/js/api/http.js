@@ -3,10 +3,12 @@ async function requestJson(path, options = {}) {
 
     const response = await fetch(path, {
         method,
-        headers: body === undefined ? undefined : {
-            "Content-Type": "application/json"
-        },
-        body: body === undefined ? undefined : JSON.stringify(body)
+        headers: body === undefined
+            ? undefined
+            : { "Content-Type": "application/json" },
+        body: body === undefined
+            ? undefined
+            : JSON.stringify(body)
     });
 
     if (!response.ok) {
@@ -22,6 +24,10 @@ async function requestJson(path, options = {}) {
 }
 
 export const api = {
+    getTodayBoard() {
+        return requestJson("/api/today-board");
+    },
+
     getTasks() {
         return requestJson("/api/tasks");
     },
@@ -85,6 +91,8 @@ export const api = {
         });
     }
 };
+
+export const getTodayBoard = () => api.getTodayBoard();
 
 export const getTasks = () => api.getTasks();
 export const createTask = (payload) => api.createTask(payload);

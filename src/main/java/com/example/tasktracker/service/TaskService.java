@@ -1,6 +1,6 @@
 package com.example.tasktracker.service;
 
-import com.example.tasktracker.api.TaskCreateRequest;
+import com.example.tasktracker.api.task.TaskCreateRequest;
 import com.example.tasktracker.domain.exception.NotFoundException;
 import com.example.tasktracker.domain.model.Task;
 import com.example.tasktracker.domain.model.TaskStatus;
@@ -19,7 +19,10 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final Clock clock;
 
-    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository) {
+    public TaskService(
+            TaskRepository taskRepository,
+            ProjectRepository projectRepository
+    ) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.clock = Clock.systemUTC();
@@ -32,7 +35,9 @@ public class TaskService {
     public Task create(TaskCreateRequest request) {
         if (request.projectId() != null) {
             projectRepository.findById(request.projectId())
-                    .orElseThrow(() -> new NotFoundException("Project not found: " + request.projectId()));
+                    .orElseThrow(() -> new NotFoundException(
+                            "Project not found: " + request.projectId()
+                    ));
         }
 
         Task task = Task.create(
@@ -49,7 +54,9 @@ public class TaskService {
 
     public Task changeStatus(UUID taskId, TaskStatus newStatus) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
+                .orElseThrow(() -> new NotFoundException(
+                        "Task not found: " + taskId
+                ));
 
         task.changeStatus(newStatus, clock);
 
@@ -63,5 +70,4 @@ public class TaskService {
 
         taskRepository.deleteById(taskId);
     }
-
 }

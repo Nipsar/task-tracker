@@ -1,7 +1,6 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.goal;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Tracker — Сегодня</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div class="page">
+  <div class="page-bg"></div>
+
+  <main class="container">
+    <nav id="appNav" class="app-nav"></nav>
+
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Today board</span>
+        <h1>Сегодня</h1>
+        <p class="subtitle">
+          Единая доска текущего дня: задачи, привычки, цели и короткая сводка.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button id="loadTodayBtn" class="primary-btn" type="button">
+          Обновить
+        </button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card accent-blue">
+        <p class="stat-label">Задачи</p>
+        <p id="totalTasksValue" class="stat-value">—</p>
+        <p id="totalTasksNote" class="stat-note">Всего на доске</p>
+      </article>
+
+      <article class="stat-card accent-green">
+        <p class="stat-label">Выполнено сегодня</p>
+        <p id="doneTasksValue" class="stat-value">—</p>
+        <p class="stat-note">Завершённые задачи</p>
+      </article>
+
+      <article class="stat-card accent-orange">
+        <p class="stat-label">Просрочено</p>
+        <p id="overdueTasksValue" class="stat-value">—</p>
+        <p class="stat-note">Незавершённые задачи</p>
+      </article>
+
+      <article class="stat-card accent-purple">
+        <p class="stat-label">Привычки</p>
+        <p id="habitsValue" class="stat-value">—</p>
+        <p id="habitsNote" class="stat-note">Выполнено сегодня</p>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel full-width">
+        <div class="panel-head">
+          <div>
+            <h2>Задачи на сегодня</h2>
+            <p>Просроченные, задачи с deadline сегодня и задачи, закрытые сегодня.</p>
+          </div>
+
+          <a class="secondary-btn" href="/tasks.html">Открыть задачи</a>
+        </div>
+
+        <div id="todayTasksList" class="task-grid">
+          Загрузка задач...
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Привычки</h2>
+            <p>Сегодняшний чеклист привычек.</p>
+          </div>
+
+          <a class="secondary-btn" href="/habits.html">Открыть привычки</a>
+        </div>
+
+        <div id="todayHabitsList" class="habit-grid">
+          Загрузка привычек...
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Цели</h2>
+            <p>Контекст активных направлений.</p>
+          </div>
+
+          <a class="secondary-btn" href="/goals.html">Открыть цели</a>
+        </div>
+
+        <div id="todayGoalsList" class="goal-grid">
+          Загрузка целей...
+        </div>
+      </article>
+    </section>
+
+    <p id="todayStatusMessage" class="form-message info"></p>
+  </main>
+</div>
+
+<script type="module" src="/js/pages/today-page.js"></script>
+</body>
+</html>

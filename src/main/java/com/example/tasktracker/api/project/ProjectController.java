@@ -1,4 +1,4 @@
-package com.example.tasktracker.api;
+package com.example.tasktracker.api.project;
 
 import com.example.tasktracker.domain.model.Project;
 import com.example.tasktracker.service.ProjectService;
