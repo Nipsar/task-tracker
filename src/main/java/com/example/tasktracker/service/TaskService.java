@@ -46,6 +46,11 @@ public class TaskService {
                 request.title(),
                 request.deadline(),
                 request.status(),
+                request.importance(),
+                request.difficulty(),
+                request.energy(),
+                request.estimatedMinutes(),
+                request.autoPlanEnabled(),
                 clock
         );
 

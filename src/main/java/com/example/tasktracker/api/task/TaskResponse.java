@@ -1,5 +1,8 @@
 package com.example.tasktracker.api.task;
 
+import com.example.tasktracker.domain.model.TaskDifficulty;
+import com.example.tasktracker.domain.model.TaskEnergy;
+import com.example.tasktracker.domain.model.TaskImportance;
 import com.example.tasktracker.domain.model.TaskStatus;
 
 import java.time.Instant;
@@ -13,6 +16,11 @@ public record TaskResponse(
         TaskStatus status,
         Instant deadline,
         Instant createdAt,
-        Instant completedAt
+        Instant completedAt,
+        TaskImportance importance,
+        TaskDifficulty difficulty,
+        TaskEnergy energy,
+        Integer estimatedMinutes,
+        Boolean autoPlanEnabled
 ) {
 }
