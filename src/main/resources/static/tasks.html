@@ -65,6 +65,47 @@
                     <input id="deadlineInput" name="deadline" type="datetime-local" class="filter-input">
                 </label>
 
+                <label class="form-field">
+                    <span>Важность</span>
+                    <select id="importanceInput" name="importance" class="filter-select" required>
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM" selected>MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Сложность</span>
+                    <select id="difficultyInput" name="difficulty" class="filter-select" required>
+                        <option value="EASY">EASY</option>
+                        <option value="MEDIUM" selected>MEDIUM</option>
+                        <option value="HARD">HARD</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Энергия</span>
+                    <select id="energyInput" name="energy" class="filter-select" required>
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM" selected>MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Время, минут</span>
+                    <input id="estimatedMinutesInput" name="estimatedMinutes" type="number" min="1" value="60" class="filter-input" required>
+                </label>
+
+                <label class="form-field">
+                    <span>Автопланирование</span>
+                    <select id="autoPlanEnabledInput" name="autoPlanEnabled" class="filter-select">
+                        <option value="true" selected>Да</option>
+                        <option value="false">Нет</option>
+                    </select>
+                </label>
+
                 <div class="form-actions">
                     <button id="createTaskBtn" type="submit" class="primary-btn">Добавить задачу</button>
                     <button id="clearTaskFormBtn" type="button" class="secondary-btn">Очистить</button>

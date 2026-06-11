@@ -55,6 +55,26 @@ export function renderTaskList({ container, tasks, projects, onStatusSave, onDel
                     <span class="task-meta-label">Status</span>
                     <strong>${escapeHtml(task.status)}</strong>
                 </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Важность</span>
+                    <strong>${escapeHtml(task.importance)}</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Сложность</span>
+                    <strong>${escapeHtml(task.difficulty)}</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Энергия</span>
+                    <strong>${escapeHtml(task.energy)}</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Время</span>
+                    <strong>${escapeHtml(String(task.estimatedMinutes))} мин</strong>
+                </div>
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Auto plan</span>
+                    <strong>${task.autoPlanEnabled ? "ON" : "OFF"}</strong>
+                </div>
             </div>
 
             <div class="task-actions">
