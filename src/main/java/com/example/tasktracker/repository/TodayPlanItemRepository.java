@@ -21,4 +21,10 @@ public interface TodayPlanItemRepository extends JpaRepository<TodayPlanItem, UU
             LocalDate plannedDate,
             TodayPlanItemStatus status
     );
+
+    @EntityGraph(attributePaths = "task")
+    List<TodayPlanItem> findByMovedToDateAndStatus(
+            LocalDate movedToDate,
+            TodayPlanItemStatus status
+    );
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 public class TodayPlannerService {
@@ -33,6 +34,7 @@ public class TodayPlannerService {
     private static final int DAILY_CAPACITY_MINUTES = 900;
     private static final int MAX_HARD_TASKS = 2;
     private static final int MAX_MEDIUM_TASKS = 5;
+    private static final int MOVED_BONUS = 150;
 
     private final TodayPlanItemRepository todayPlanItemRepository;
     private final TaskRepository taskRepository;
@@ -60,6 +62,7 @@ public class TodayPlannerService {
     @Transactional
     public TodayBoardResponse getTodayBoard() {
         LocalDate today = LocalDate.now(clock);
+        Set<UUID> movedToTodayTaskIds = loadMovedToTodayTaskIds(today);
 
         List<TodayPlanItem> planItems;
 
@@ -69,10 +72,10 @@ public class TodayPlannerService {
                     TodayPlanItemStatus.PLANNED
             );
         } else {
-            planItems = generateTodayPlan(today);
+            planItems = generateTodayPlan(today, movedToTodayTaskIds);
         }
 
-        return toResponse(today, planItems);
+        return toResponse(today, planItems, movedToTodayTaskIds);
     }
 
     @Transactional
@@ -103,14 +106,27 @@ public class TodayPlannerService {
                 ));
     }
 
-    private List<TodayPlanItem> generateTodayPlan(LocalDate today) {
+    private Set<UUID> loadMovedToTodayTaskIds(LocalDate today) {
+        return todayPlanItemRepository.findByMovedToDateAndStatus(
+                        today,
+                        TodayPlanItemStatus.MOVED
+                )
+                .stream()
+                .map(item -> item.getTask().getId())
+                .collect(Collectors.toSet());
+    }
+
+    private List<TodayPlanItem> generateTodayPlan(
+            LocalDate today,
+            Set<UUID> movedToTodayTaskIds
+    ) {
         List<Task> activeTasks = taskRepository.findByStatusNotAndAutoPlanEnabledTrue(TaskStatus.DONE);
 
         List<TaskScore> scoredTasks = activeTasks.stream()
                 .filter(task -> task.getEstimatedMinutes() != null)
                 .filter(task -> task.getEstimatedMinutes() > 0)
                 .filter(task -> !isWeekend(today) || isOverdue(task, today))
-                .map(task -> new TaskScore(task, calculateScore(task, today)))
+                .map(task -> new TaskScore( task, calculateScore( task, today, movedToTodayTaskIds.contains(task.getId()))))
                 .sorted(Comparator.comparingInt(TaskScore::score).reversed())
                 .toList();
 
@@ -154,10 +170,10 @@ public class TodayPlannerService {
         return todayPlanItemRepository.saveAll(selectedItems);
     }
 
-    private TodayBoardResponse toResponse(LocalDate today, List<TodayPlanItem> planItems) {
+    private TodayBoardResponse toResponse(LocalDate today, List<TodayPlanItem> planItems, Set<UUID> movedToTodayTaskIds) {
         List<TodayBoardResponse.TaskItem> tasks = planItems.stream()
-                .sorted(todayBoardComparator(today))
-                .map(item -> toTaskItem(item, today))
+                .sorted(todayBoardComparator(today, movedToTodayTaskIds))
+                .map(item -> toTaskItem(item, today, movedToTodayTaskIds))
                 .toList();
 
         List<Habit> habits = habitRepository.findAll();
@@ -191,8 +207,13 @@ public class TodayPlannerService {
         );
     }
 
-    private TodayBoardResponse.TaskItem toTaskItem(TodayPlanItem item, LocalDate today) {
+    private TodayBoardResponse.TaskItem toTaskItem(
+            TodayPlanItem item,
+            LocalDate today,
+            Set<UUID> movedToTodayTaskIds
+    ) {
         Task task = item.getTask();
+        boolean movedToToday = movedToTodayTaskIds.contains(task.getId());
 
         return new TodayBoardResponse.TaskItem(
                 item.getId(),
@@ -209,15 +230,25 @@ public class TodayPlannerService {
                 task.getAutoPlanEnabled(),
                 item.getStatus(),
                 item.getPlannedDate(),
-                calculateScore(task, today)
+                calculateScore(task, today, movedToToday)
         );
     }
 
-    private Comparator<TodayPlanItem> todayBoardComparator(LocalDate today) {
+    private Comparator<TodayPlanItem> todayBoardComparator(
+            LocalDate today,
+            Set<UUID> movedToTodayTaskIds
+    ) {
         return Comparator
                 .comparingInt((TodayPlanItem item) -> energyOrder(item.getTask().getEnergy()))
                 .thenComparing(
-                        Comparator.comparingInt((TodayPlanItem item) -> calculateScore(item.getTask(), today))
+                        Comparator.comparingInt((TodayPlanItem item) -> {
+                                    Task task = item.getTask();
+                                    return calculateScore(
+                                            task,
+                                            today,
+                                            movedToTodayTaskIds.contains(task.getId())
+                                    );
+                                })
                                 .reversed()
                 );
     }
@@ -231,9 +262,22 @@ public class TodayPlannerService {
     }
 
     private int calculateScore(Task task, LocalDate today) {
+        return calculateScore(task, today, false);
+    }
+
+    private int calculateScore(
+            Task task,
+            LocalDate today,
+            boolean movedToToday
+    ) {
         return deadlineScore(task, today)
                 + importanceScore(task.getImportance())
+                + movedBonus(movedToToday)
                 + ageScore(task, today);
+    }
+
+    private int movedBonus(boolean movedToToday) {
+        return movedToToday ? MOVED_BONUS : 0;
     }
 
     private int deadlineScore(Task task, LocalDate today) {
