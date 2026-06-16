@@ -24,4 +24,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
             Instant end,
             TaskStatus status
     );
+
+    List<Task> findByStatusNotAndAutoPlanEnabledTrue(TaskStatus status);
 }

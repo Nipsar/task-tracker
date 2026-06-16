@@ -9,7 +9,12 @@ export function normalizeTasks(tasks) {
         status: String(task.status ?? "NEW"),
         deadline: parseDate(task.deadline),
         createdAt: parseDate(task.createdAt),
-        completedAt: parseDate(task.completedAt)
+        completedAt: parseDate(task.completedAt),
+        importance: String(task.importance ?? "MEDIUM"),
+        difficulty: String(task.difficulty ?? "MEDIUM"),
+        energy: String(task.energy ?? "MEDIUM"),
+        estimatedMinutes: Number(task.estimatedMinutes ?? 60),
+        autoPlanEnabled: task.autoPlanEnabled !== false
     }));
 }
 

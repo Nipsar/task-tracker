@@ -25,6 +25,7 @@ initNavigation("today");
 document.addEventListener("DOMContentLoaded", initPage);
 
 elements.loadButton?.addEventListener("click", loadTodayBoard);
+elements.tasksList?.addEventListener("click", onTodayTaskActionClick);
 
 async function initPage() {
     await loadTodayBoard();
@@ -93,7 +94,7 @@ function renderTasks(tasks) {
     if (tasks.length === 0) {
         elements.tasksList.innerHTML = renderEmptyState(
             "На сегодня задач нет",
-            "Нет просроченных задач, задач с deadline сегодня или закрытых сегодня."
+            "Автоплан не выбрал задач на сегодня или все задачи уже выполнены/перенесены."
         );
         return;
     }
@@ -102,61 +103,145 @@ function renderTasks(tasks) {
         const card = document.createElement("article");
         card.className = "task-card";
 
-        const labels = [
-            task.overdue ? "Просрочено" : null,
-            task.dueToday ? "Сегодня" : null,
-            task.completedToday ? "Закрыто сегодня" : null
-        ].filter(Boolean);
-
         const deadlineText = task.deadline
             ? formatDate(task.deadline)
             : "Без deadline";
 
-        const completedText = task.completedAt
-            ? formatDate(task.completedAt)
-            : "—";
+        const estimatedMinutes = Number(task.estimatedMinutes ?? 0);
+        const score = Number(task.score ?? 0);
+
+        const todayPlanItemId = task.todayPlanItemId;
 
         card.innerHTML = `
             <div class="task-top">
                 <div>
                     <h3>${escapeHtml(task.title)}</h3>
-                    <p class="task-id">${escapeHtml(task.id)}</p>
+                    <p class="task-id">
+                        task: ${escapeHtml(task.taskId ?? "—")}
+                    </p>
+                    <p class="task-id">
+                        plan item: ${escapeHtml(todayPlanItemId ?? "—")}
+                    </p>
                 </div>
 
-                <span class="badge ${escapeHtml(task.status)}">
-                    ${escapeHtml(task.status)}
+                <span class="badge ${escapeHtml(task.taskStatus ?? "ACTIVE")}">
+                    ${escapeHtml(task.taskStatus ?? "ACTIVE")}
                 </span>
             </div>
 
             <div class="task-meta-grid">
-                <div class="task-meta-item">
-                    <span class="task-meta-label">Проект</span>
-                    ${escapeHtml(task.projectTitle ?? "Без проекта")}
-                </div>
-
-                <div class="task-meta-item">
-                    <span class="task-meta-label">Цель</span>
-                    ${escapeHtml(task.goalTitle ?? "Без цели")}
-                </div>
-
                 <div class="task-meta-item">
                     <span class="task-meta-label">Deadline</span>
                     ${escapeHtml(deadlineText)}
                 </div>
 
                 <div class="task-meta-item">
-                    <span class="task-meta-label">Completed</span>
-                    ${escapeHtml(completedText)}
+                    <span class="task-meta-label">Важность</span>
+                    ${escapeHtml(formatImportance(task.importance))}
+                </div>
+
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Сложность</span>
+                    ${escapeHtml(formatDifficulty(task.difficulty))}
+                </div>
+
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Энергия</span>
+                    ${escapeHtml(formatEnergy(task.energy))}
+                </div>
+
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Время</span>
+                    ${estimatedMinutes > 0 ? `${estimatedMinutes} мин.` : "—"}
+                </div>
+
+                <div class="task-meta-item">
+                    <span class="task-meta-label">Score</span>
+                    ${score}
                 </div>
             </div>
 
             <p class="stat-note">
-                ${labels.length === 0 ? "Без специальных меток" : escapeHtml(labels.join(" · "))}
+                ${escapeHtml(formatPlanStatus(task.planStatus))}
+                ${task.plannedDate ? ` · ${escapeHtml(task.plannedDate)}` : ""}
+                ${task.autoPlanEnabled === false ? " · Автоплан выключен" : ""}
             </p>
+
+            <div class="today-task-actions">
+                <button
+                    class="primary-btn"
+                    type="button"
+                    data-today-action="done"
+                    data-item-id="${escapeHtml(todayPlanItemId ?? "")}"
+                    ${todayPlanItemId ? "" : "disabled"}
+                >
+                    Готово
+                </button>
+
+                <button
+                    class="secondary-btn"
+                    type="button"
+                    data-today-action="move-tomorrow"
+                    data-item-id="${escapeHtml(todayPlanItemId ?? "")}"
+                    ${todayPlanItemId ? "" : "disabled"}
+                >
+                    На завтра
+                </button>
+            </div>
         `;
 
         elements.tasksList.appendChild(card);
     });
+}
+
+async function onTodayTaskActionClick(event) {
+    const button = event.target.closest("[data-today-action]");
+
+    if (!button) {
+        return;
+    }
+
+    const itemId = button.dataset.itemId;
+    const action = button.dataset.todayAction;
+
+    if (!itemId) {
+        elements.statusMessage.textContent = "У задачи нет todayPlanItemId.";
+        elements.statusMessage.className = "form-message error";
+        return;
+    }
+
+    setTodayActionButtonsDisabled(true);
+
+    try {
+        const board = action === "done"
+            ? await api.markTodayBoardItemDone(itemId)
+            : await api.moveTodayBoardItemTomorrow(itemId);
+
+        renderSummary(board.summary);
+        renderTasks(board.tasks ?? []);
+        renderHabits(board.habits ?? []);
+        renderGoals(board.goals ?? []);
+
+        elements.statusMessage.textContent = action === "done"
+            ? "Задача выполнена."
+            : "Задача перенесена на завтра.";
+
+        elements.statusMessage.className = "form-message success";
+    } catch (error) {
+        console.error(error);
+        elements.statusMessage.textContent = normalizeErrorMessage(error);
+        elements.statusMessage.className = "form-message error";
+    } finally {
+        setTodayActionButtonsDisabled(false);
+    }
+}
+
+function setTodayActionButtonsDisabled(isDisabled) {
+    elements.tasksList
+        ?.querySelectorAll("[data-today-action]")
+        .forEach(button => {
+            button.disabled = isDisabled;
+        });
 }
 
 function renderHabits(habits) {
@@ -286,6 +371,60 @@ function renderGoals(goals) {
 
         elements.goalsList.appendChild(card);
     });
+}
+
+function formatImportance(value) {
+    switch (value) {
+        case "LOW":
+            return "Низкая";
+        case "MEDIUM":
+            return "Средняя";
+        case "HIGH":
+            return "Высокая";
+        case "CRITICAL":
+            return "Критическая";
+        default:
+            return value ?? "—";
+    }
+}
+
+function formatDifficulty(value) {
+    switch (value) {
+        case "EASY":
+            return "Лёгкая";
+        case "MEDIUM":
+            return "Средняя";
+        case "HARD":
+            return "Сложная";
+        default:
+            return value ?? "—";
+    }
+}
+
+function formatEnergy(value) {
+    switch (value) {
+        case "LOW":
+            return "Низкая";
+        case "MEDIUM":
+            return "Средняя";
+        case "HIGH":
+            return "Высокая";
+        default:
+            return value ?? "—";
+    }
+}
+
+function formatPlanStatus(value) {
+    switch (value) {
+        case "PLANNED":
+            return "Запланировано";
+        case "DONE":
+            return "Выполнено";
+        case "MOVED":
+            return "Перенесено";
+        default:
+            return value ?? "—";
+    }
 }
 
 function setLoading(isLoading) {

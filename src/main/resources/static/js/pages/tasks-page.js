@@ -20,21 +20,41 @@ const elements = {
     taskList: document.getElementById("taskList"),
     searchInput: document.getElementById("searchInput"),
     statusFilter: document.getElementById("statusFilter"),
+
     form: document.getElementById("createTaskForm"),
     projectSelect: document.getElementById("projectSelectInput"),
     goalSelect: document.getElementById("goalSelectInput"),
     titleInput: document.getElementById("titleInput"),
     statusInput: document.getElementById("createStatusInput"),
     deadlineInput: document.getElementById("deadlineInput"),
+
+    importanceInput: document.getElementById("importanceInput"),
+    difficultyInput: document.getElementById("difficultyInput"),
+    energyInput: document.getElementById("energyInput"),
+    estimatedMinutesInput: document.getElementById("estimatedMinutesInput"),
+    autoPlanEnabledInput: document.getElementById("autoPlanEnabledInput"),
+
     submitButton: document.getElementById("createTaskBtn"),
     clearButton: document.getElementById("clearTaskFormBtn"),
     formMessage: document.getElementById("createTaskMessage")
 };
 
-initNavigation("tasks");
+startPageWhenReady();
 
-bindEvents();
-document.addEventListener("DOMContentLoaded", initPage);
+function startPageWhenReady() {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startPage);
+        return;
+    }
+
+    startPage();
+}
+
+async function startPage() {
+    initNavigation("tasks");
+    bindEvents();
+    await initPage();
+}
 
 function bindEvents() {
     elements.loadButton?.addEventListener("click", loadTasks);
@@ -131,7 +151,12 @@ async function onCreateTaskSubmit(event) {
             goalId: formData.goalId || null,
             title: formData.title,
             status: formData.status,
-            deadline: toIsoOrNull(formData.deadline)
+            deadline: toIsoOrNull(formData.deadline),
+            importance: formData.importance,
+            difficulty: formData.difficulty,
+            energy: formData.energy,
+            estimatedMinutes: formData.estimatedMinutes,
+            autoPlanEnabled: formData.autoPlanEnabled
         });
 
         resetForm();
@@ -189,7 +214,12 @@ function getFormData() {
         goalId: elements.goalSelect?.value || null,
         title: elements.titleInput?.value.trim() ?? "",
         status: elements.statusInput?.value ?? "NEW",
-        deadline: elements.deadlineInput?.value ?? ""
+        deadline: elements.deadlineInput?.value ?? "",
+        importance: elements.importanceInput?.value ?? "MEDIUM",
+        difficulty: elements.difficultyInput?.value ?? "MEDIUM",
+        energy: elements.energyInput?.value ?? "MEDIUM",
+        estimatedMinutes: Number(elements.estimatedMinutesInput?.value ?? 60),
+        autoPlanEnabled: elements.autoPlanEnabledInput?.value !== "false"
     };
 }
 
@@ -214,11 +244,32 @@ function validateFormData(data) {
         return "Некорректный deadline.";
     }
 
+    if (!["LOW", "MEDIUM", "HIGH", "CRITICAL"].includes(data.importance)) {
+        return "Некорректная важность.";
+    }
+
+    if (!["EASY", "MEDIUM", "HARD"].includes(data.difficulty)) {
+        return "Некорректная сложность.";
+    }
+
+    if (!["LOW", "MEDIUM", "HIGH"].includes(data.energy)) {
+        return "Некорректная энергия.";
+    }
+
+    if (!Number.isInteger(data.estimatedMinutes) || data.estimatedMinutes <= 0) {
+        return "Время выполнения должно быть больше 0.";
+    }
+
     return null;
 }
 
 function resetForm() {
     elements.form?.reset();
+    elements.importanceInput.value = "MEDIUM";
+    elements.difficultyInput.value = "MEDIUM";
+    elements.energyInput.value = "MEDIUM";
+    elements.estimatedMinutesInput.value = "60";
+    elements.autoPlanEnabledInput.value = "true";
 
     if (elements.statusInput) {
         elements.statusInput.value = "NEW";
@@ -229,29 +280,62 @@ function resetForm() {
 }
 
 function setPageLoading(isLoading) {
-    if (!elements.loadButton) return;
-    elements.loadButton.disabled = isLoading;
-    elements.loadButton.textContent = isLoading ? "Загрузка..." : "Обновить задачи";
+    if (elements.loadButton) {
+        elements.loadButton.disabled = isLoading;
+        elements.loadButton.textContent = isLoading ? "Загрузка..." : "Обновить задачи";
+    }
 
-    if (isLoading && elements.statusMessage) {
-        elements.statusMessage.textContent = "Загружаю задачи...";
+    if (elements.statusMessage) {
+        elements.statusMessage.textContent = isLoading
+            ? "Загружаю задачи..."
+            : elements.statusMessage.textContent;
     }
 }
 
 function setFormLoading(isLoading) {
-    if (!elements.submitButton) return;
+    if (elements.submitButton) {
+        elements.submitButton.disabled = isLoading;
+        elements.submitButton.textContent = isLoading ? "Создаём..." : "Создать задачу";
+    }
 
-    elements.submitButton.disabled = isLoading;
-    elements.submitButton.textContent = isLoading ? "Создание..." : "Добавить задачу";
-
-    elements.projectSelect.disabled = isLoading || state.projects.length === 0;
-    elements.titleInput.disabled = isLoading;
-    elements.statusInput.disabled = isLoading;
-    elements.deadlineInput.disabled = isLoading;
-    elements.clearButton.disabled = isLoading;
+    if (elements.projectSelect) {
+        elements.projectSelect.disabled = isLoading;
+    }
 
     if (elements.goalSelect) {
         elements.goalSelect.disabled = isLoading;
+    }
+
+    if (elements.titleInput) {
+        elements.titleInput.disabled = isLoading;
+    }
+
+    if (elements.statusInput) {
+        elements.statusInput.disabled = isLoading;
+    }
+
+    if (elements.deadlineInput) {
+        elements.deadlineInput.disabled = isLoading;
+    }
+
+    if (elements.importanceInput) {
+        elements.importanceInput.disabled = isLoading;
+    }
+
+    if (elements.difficultyInput) {
+        elements.difficultyInput.disabled = isLoading;
+    }
+
+    if (elements.energyInput) {
+        elements.energyInput.disabled = isLoading;
+    }
+
+    if (elements.estimatedMinutesInput) {
+        elements.estimatedMinutesInput.disabled = isLoading;
+    }
+
+    if (elements.autoPlanEnabledInput) {
+        elements.autoPlanEnabledInput.disabled = isLoading;
     }
 }
 

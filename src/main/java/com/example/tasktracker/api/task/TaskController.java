@@ -57,7 +57,12 @@ public class TaskController {
                 task.getStatus(),
                 task.getDeadline(),
                 task.getCreatedAt(),
-                task.getCompletedAt()
+                task.getCompletedAt(),
+                task.getImportance(),
+                task.getDifficulty(),
+                task.getEnergy(),
+                task.getEstimatedMinutes(),
+                task.getAutoPlanEnabled()
         );
     }
 
