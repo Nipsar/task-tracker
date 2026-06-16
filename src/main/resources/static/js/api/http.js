@@ -71,6 +71,18 @@ export const api = {
         return requestJson("/api/today-board");
     },
 
+    markTodayBoardItemDone(itemId) {
+        return requestJson(`/api/today-board/items/${itemId}/done`, {
+            method: "PATCH"
+        });
+    },
+
+    moveTodayBoardItemTomorrow(itemId) {
+        return requestJson(`/api/today-board/items/${itemId}/move-tomorrow`, {
+            method: "PATCH"
+        });
+    },
+
     getRecipes() {
         return requestJson("/api/recipes");
     },
@@ -134,6 +146,12 @@ export const getHabits = () => api.getHabits();
 export const createHabit = (payload) => api.createHabit(payload);
 export const completeHabit = (habitId) => api.completeHabit(habitId);
 export const getTodayBoard = () => api.getTodayBoard();
+
+export const markTodayBoardItemDone = (itemId) =>
+  api.markTodayBoardItemDone(itemId);
+
+export const moveTodayBoardItemTomorrow = (itemId) =>
+  api.moveTodayBoardItemTomorrow(itemId);
 
 export const getRecipes = () => api.getRecipes();
 export const createRecipe = (payload) => api.createRecipe(payload);

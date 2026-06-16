@@ -1969,3 +1969,14 @@ h1 {
 .weekly-day-target.is-over {
     color: #ef4444;
 }
+
+.today-task-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.today-task-actions button {
+  min-width: 120px;
+}
