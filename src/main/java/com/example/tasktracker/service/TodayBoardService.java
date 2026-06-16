@@ -6,6 +6,7 @@ import com.example.tasktracker.domain.model.Habit;
 import com.example.tasktracker.domain.model.Project;
 import com.example.tasktracker.domain.model.Task;
 import com.example.tasktracker.domain.model.TaskStatus;
+import com.example.tasktracker.domain.model.TodayPlanItemStatus;
 import com.example.tasktracker.repository.GoalRepository;
 import com.example.tasktracker.repository.HabitRepository;
 import com.example.tasktracker.repository.ProjectRepository;
@@ -73,21 +74,8 @@ public class TodayBoardService {
 
         Map<UUID, String> projectTitlesById = loadProjectTitles(todayTasks, goals);
 
-        Map<UUID, String> goalTitlesById = goals.stream()
-                .collect(Collectors.toMap(
-                        Goal::getId,
-                        Goal::getTitle,
-                        (left, right) -> left
-                ));
-
         List<TodayBoardResponse.TaskItem> taskItems = todayTasks.stream()
-                .map(task -> toTaskItem(
-                        task,
-                        startOfDay,
-                        endOfDay,
-                        projectTitlesById,
-                        goalTitlesById
-                ))
+                .map(task -> toTaskItem(task, today))
                 .sorted(Comparator
                         .comparing(
                                 TodayBoardResponse.TaskItem::deadline,
@@ -108,6 +96,7 @@ public class TodayBoardService {
                 .toList();
 
         TodayBoardResponse.Summary summary = buildSummary(
+                today,
                 taskItems,
                 habitItems,
                 goalItems
@@ -161,37 +150,26 @@ public class TodayBoardService {
 
     private TodayBoardResponse.TaskItem toTaskItem(
             Task task,
-            Instant startOfDay,
-            Instant endOfDay,
-            Map<UUID, String> projectTitlesById,
-            Map<UUID, String> goalTitlesById
+            LocalDate today
     ) {
-        boolean overdue = task.getStatus() != TaskStatus.DONE
-                && task.getDeadline() != null
-                && task.getDeadline().isBefore(startOfDay);
-
-        boolean dueToday = task.getDeadline() != null
-                && !task.getDeadline().isBefore(startOfDay)
-                && task.getDeadline().isBefore(endOfDay);
-
-        boolean completedToday = task.getCompletedAt() != null
-                && !task.getCompletedAt().isBefore(startOfDay)
-                && task.getCompletedAt().isBefore(endOfDay);
-
         return new TodayBoardResponse.TaskItem(
-                task.getId(),
-                task.getProjectId(),
-                projectTitlesById.get(task.getProjectId()),
-                task.getGoalId(),
-                goalTitlesById.get(task.getGoalId()),
-                task.getTitle(),
-                task.getStatus(),
-                task.getDeadline(),
-                task.getCreatedAt(),
-                task.getCompletedAt(),
-                overdue,
-                dueToday,
-                completedToday
+                null,                         // todayPlanItemId: старый сервис не работает с today_plan_items
+                task.getId(),                 // taskId
+                task.getProjectId(),          // projectId
+                task.getGoalId(),             // goalId
+                task.getTitle(),              // title
+                task.getStatus(),             // taskStatus
+                task.getDeadline(),           // deadline
+
+                task.getImportance(),         // importance
+                task.getDifficulty(),         // difficulty
+                task.getEnergy(),             // energy
+                task.getEstimatedMinutes(),   // estimatedMinutes
+                task.getAutoPlanEnabled(),    // autoPlanEnabled
+
+                TodayPlanItemStatus.PLANNED,  // planStatus
+                today,                        // plannedDate
+                0                             // score
         );
     }
 
@@ -242,20 +220,21 @@ public class TodayBoardService {
     }
 
     private TodayBoardResponse.Summary buildSummary(
+            LocalDate today,
             List<TodayBoardResponse.TaskItem> taskItems,
             List<TodayBoardResponse.HabitItem> habitItems,
             List<TodayBoardResponse.GoalItem> goalItems
     ) {
         int doneTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::completedToday)
+                .filter(task -> task.taskStatus() == TaskStatus.DONE)
                 .count();
 
         int overdueTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::overdue)
+                .filter(task -> isOverdue(task, today))
                 .count();
 
         int dueTodayTasks = (int) taskItems.stream()
-                .filter(TodayBoardResponse.TaskItem::dueToday)
+                .filter(task -> isDueToday(task, today))
                 .count();
 
         int completedHabits = (int) habitItems.stream()
@@ -271,5 +250,35 @@ public class TodayBoardService {
                 completedHabits,
                 goalItems.size()
         );
+    }
+
+    private boolean isOverdue(
+            TodayBoardResponse.TaskItem task,
+            LocalDate today
+    ) {
+        if (task.taskStatus() == TaskStatus.DONE || task.deadline() == null) {
+            return false;
+        }
+
+        LocalDate deadlineDate = task.deadline()
+                .atZone(clock.getZone())
+                .toLocalDate();
+
+        return deadlineDate.isBefore(today);
+    }
+
+    private boolean isDueToday(
+            TodayBoardResponse.TaskItem task,
+            LocalDate today
+    ) {
+        if (task.deadline() == null) {
+            return false;
+        }
+
+        LocalDate deadlineDate = task.deadline()
+                .atZone(clock.getZone())
+                .toLocalDate();
+
+        return deadlineDate.isEqual(today);
     }
 }

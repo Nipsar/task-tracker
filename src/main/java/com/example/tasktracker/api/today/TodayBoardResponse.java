@@ -1,6 +1,6 @@
 package com.example.tasktracker.api.today;
 
-import com.example.tasktracker.domain.model.TaskStatus;
+import com.example.tasktracker.domain.model.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,19 +16,23 @@ public record TodayBoardResponse(
 ) {
 
     public record TaskItem(
-            UUID id,
+            UUID todayPlanItemId,
+            UUID taskId,
             UUID projectId,
-            String projectTitle,
             UUID goalId,
-            String goalTitle,
             String title,
-            TaskStatus status,
+            TaskStatus taskStatus,
             Instant deadline,
-            Instant createdAt,
-            Instant completedAt,
-            boolean overdue,
-            boolean dueToday,
-            boolean completedToday
+
+            TaskImportance importance,
+            TaskDifficulty difficulty,
+            TaskEnergy energy,
+            Integer estimatedMinutes,
+            Boolean autoPlanEnabled,
+
+            TodayPlanItemStatus planStatus,
+            LocalDate plannedDate,
+            Integer score
     ) {
     }
 
