@@ -20,28 +20,41 @@ const elements = {
     taskList: document.getElementById("taskList"),
     searchInput: document.getElementById("searchInput"),
     statusFilter: document.getElementById("statusFilter"),
+
     form: document.getElementById("createTaskForm"),
     projectSelect: document.getElementById("projectSelectInput"),
     goalSelect: document.getElementById("goalSelectInput"),
     titleInput: document.getElementById("titleInput"),
     statusInput: document.getElementById("createStatusInput"),
     deadlineInput: document.getElementById("deadlineInput"),
-    submitButton: document.getElementById("createTaskBtn"),
-    clearButton: document.getElementById("clearTaskFormBtn"),
-    formMessage: document.getElementById("createTaskMessage"),
+
     importanceInput: document.getElementById("importanceInput"),
     difficultyInput: document.getElementById("difficultyInput"),
     energyInput: document.getElementById("energyInput"),
     estimatedMinutesInput: document.getElementById("estimatedMinutesInput"),
     autoPlanEnabledInput: document.getElementById("autoPlanEnabledInput"),
 
-    submitButton: document.querySelector("#createTaskForm button[type='submit']")
+    submitButton: document.getElementById("createTaskBtn"),
+    clearButton: document.getElementById("clearTaskFormBtn"),
+    formMessage: document.getElementById("createTaskMessage")
 };
 
-initNavigation("tasks");
+startPageWhenReady();
 
-bindEvents();
-document.addEventListener("DOMContentLoaded", initPage);
+function startPageWhenReady() {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startPage);
+        return;
+    }
+
+    startPage();
+}
+
+async function startPage() {
+    initNavigation("tasks");
+    bindEvents();
+    await initPage();
+}
 
 function bindEvents() {
     elements.loadButton?.addEventListener("click", loadTasks);
@@ -267,13 +280,15 @@ function resetForm() {
 }
 
 function setPageLoading(isLoading) {
-    if (!elements.loadButton) return;
-    elements.loadButton.disabled = isLoading;
-    elements.loadButton.textContent = isLoading ? "Загрузка..." : "Обновить задачи";
+    if (elements.loadButton) {
+        elements.loadButton.disabled = isLoading;
+        elements.loadButton.textContent = isLoading ? "Загрузка..." : "Обновить задачи";
+    }
 
-
-    if (isLoading && elements.statusMessage) {
-        elements.statusMessage.textContent = "Загружаю задачи...";
+    if (elements.statusMessage) {
+        elements.statusMessage.textContent = isLoading
+            ? "Загружаю задачи..."
+            : elements.statusMessage.textContent;
     }
 }
 

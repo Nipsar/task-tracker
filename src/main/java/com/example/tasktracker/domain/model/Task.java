@@ -86,7 +86,7 @@ public class Task {
         this.difficulty = requireDifficulty(difficulty);
         this.energy = requireEnergy(energy);
         this.estimatedMinutes = requirePositiveEstimatedMinutes(estimatedMinutes);
-        this.autoPlanEnabled = autoPlanEnabled;
+        this.autoPlanEnabled = autoPlanEnabled != null ? autoPlanEnabled : true;
 
 
         if (deadline != null) {
@@ -217,7 +217,7 @@ public class Task {
             throw new ValidationException("task.estimatedMinutes.null", "estimatedMinutes must not be null");
         }
         if (estimatedMinutes <= 0) {
-            throw new ValidationException("task.estimatedMinutes.null", "estimatedMinutes must be positive");
+            throw new ValidationException("task.estimatedMinutes.notPositive", "estimatedMinutes must be positive");
         }
         return estimatedMinutes;
     }
